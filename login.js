@@ -28,6 +28,12 @@ const siteArr = [{
 		domain: '.xiaohongshu.com',
 	},
 }, {
+	url: 'https://weibo.com/',
+	cookie: {
+		name: 'SUB',
+		domain: '.weibo.com',
+	},
+}, {
 	url: 'https://user.qzone.qq.com/896034685/311',
 	cookie: {
 		name: 'p_skey',

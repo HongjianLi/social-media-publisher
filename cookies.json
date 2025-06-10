@@ -24,6 +24,12 @@
 		"expires": 2147483646
 	},
 	{
+		"name": "SUB",
+		"value": "",
+		"domain": ".weibo.com",
+		"expires": 2147483646
+	},
+	{
 		"name": "uin",
 		"value": "",
 		"domain": ".qq.com",
