@@ -33,7 +33,7 @@ const browser = await puppeteer.launch({
 await Promise.all([...Array(mediaArr.length - 1)].map(_ => browser.newPage()));
 const pageArr = await browser.pages();
 console.assert(pageArr.length === mediaArr.length);
-const m = 9; // QQ说说 supports uploading 9 pictures at most. Kuaishou supports uploading 31 pictures. Xiaohongshu supports uploading 18 pictures. Douyin supports uploading 100 pictures.
+const m = 9; // QQ说说 supports uploading 9 pictures at most. Kuaishou supports uploading 31 pictures. Xiaohongshu and weibo support uploading 18 pictures. Douyin supports uploading 100 pictures.
 await Promise.all(mediaArr.map(async (media, index) => {
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	if (media.fileArr.length > m) {
