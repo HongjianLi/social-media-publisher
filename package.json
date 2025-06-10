@@ -1,7 +1,7 @@
 {
 	"name": "social-media-publisher",
 	"version": "1.0.0",
-	"description": "Publish pictures and texts to social media platforms, e.g. douyin, xiaohongshu, qzone.",
+	"description": "Publish pictures and texts to social media platforms, e.g. douyin, kuaishou, xiaohongshu, weibo, qzone.",
 	"author": "Hongjian Li",
 	"type": "module",
 	"repository": {
