@@ -11,7 +11,7 @@ const page = (await browser.pages())[0];
 await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0');
 const url = 'https://cp.kuaishou.com/article/publish/video?tabType=2';
 const mediaArr = await fs.readFile('media.json').then(JSON.parse);
-for (const media of mediaArr.slice(1)) {
+for (const media of mediaArr) {
 	await page.goto(url, { waitUntil: 'networkidle2', timeout: 9000 });
 	console.assert(page.url() === url);
 	const [fileChooser] = await Promise.all([
