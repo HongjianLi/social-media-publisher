@@ -6,6 +6,18 @@
 		"expires": 2147483646
 	},
 	{
+		"name": "userId",
+		"value": "",
+		"domain": ".kuaishou.com",
+		"expires": 2147483646
+	},
+	{
+		"name": "kuaishou.web.cp.api_st",
+		"value": "",
+		"domain": ".kuaishou.com",
+		"expires": 2147483646
+	},
+	{
 		"name": "access-token-creator.xiaohongshu.com",
 		"value": "",
 		"domain": ".xiaohongshu.com",

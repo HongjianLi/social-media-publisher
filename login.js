@@ -16,6 +16,12 @@ const siteArr = [{
 		domain: '.douyin.com',
 	},
 }, {
+	url: 'https://cp.kuaishou.com/article/publish/video?tabType=2',
+	cookie: {
+		name: 'kuaishou.web.cp.api_st',
+		domain: '.kuaishou.com',
+	},
+}, {
 	url: 'https://creator.xiaohongshu.com/publish/publish',
 	cookie: {
 		name: 'access-token-creator.xiaohongshu.com',
