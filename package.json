@@ -1,0 +1,17 @@
+{
+	"name": "social-media-publisher",
+	"version": "1.0.0",
+	"description": "Publish pictures and texts to social media platforms, e.g. douyin, xiaohongshu, qzone.",
+	"author": "Hongjian Li",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/HongjianLi/social-media-publisher.git"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"exifreader": "^4.31.0",
+		"openai": "^4.104.0",
+		"puppeteer-core": "^23.11.1"
+	}
+}

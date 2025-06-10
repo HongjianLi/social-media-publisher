@@ -1,0 +1,32 @@
+[
+	{
+		"name": "sessionid",
+		"value": "",
+		"domain": ".douyin.com",
+		"expires": 2147483646
+	},
+	{
+		"name": "access-token-creator.xiaohongshu.com",
+		"value": "",
+		"domain": ".xiaohongshu.com",
+		"expires": 2147483646
+	},
+	{
+		"name": "uin",
+		"value": "",
+		"domain": ".qq.com",
+		"expires": 2147483646
+	},
+	{
+		"name": "p_uin",
+		"value": "",
+		"domain": ".qzone.qq.com",
+		"expires": 2147483646
+	},
+	{
+		"name": "p_skey",
+		"value": "",
+		"domain": ".qzone.qq.com",
+		"expires": 2147483646
+	}
+]
