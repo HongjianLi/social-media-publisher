@@ -14,6 +14,7 @@ const mediaArr = await fs.readFile('media.json').then(JSON.parse);
 for (const media of mediaArr) {
 	await page.goto(url, { waitUntil: 'networkidle2', timeout: 9000 });
 	console.assert(page.url() === url);
+	await page.waitForSelector('button._upload-btn_ysbff_57', { timeout: 8000 });
 	const [fileChooser] = await Promise.all([
 		page.waitForFileChooser(),
 		page.click('button._upload-btn_ysbff_57'),
