@@ -24,7 +24,14 @@ for (const media of mediaArr) {
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.type('div._description_2klkp_59', `${media.date}${media.weekday}${media.province}${media.city}${media.district}\n\n${media.description}`.slice(0, 490)); // Max 500 characters
+	await page.click('input#rc_select_1'); // 添加地点。快手不支持自定义地址，只支持当前位置
 	await new Promise(resolve => setTimeout(resolve, 4000 * media.fileArr.length ));
+	await new Promise(resolve => setTimeout(resolve, 3000));
+	await page.click('ul.ant-cascader-menu>li:nth-child(1)');
+	await new Promise(resolve => setTimeout(resolve, 1000));
+//	await page.click('input#rc_select_2'); // 详细地址
+//	await new Promise(resolve => setTimeout(resolve, 3000));
+//	await page.click('div.rc-virtual-list-holder-inner>div:nth-child(1)');
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 4000 }),
 		page.click('div._button-primary_3a3lq_60'),

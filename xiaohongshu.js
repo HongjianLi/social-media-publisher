@@ -27,6 +27,9 @@ for (const media of mediaArr) {
 	]);
 	await page.type('input.d-text', `${media.date}${media.weekday}${media.province}${media.city}${media.district}`); // Max 20 characters
 	await page.type('div.ql-editor', media.description);
+	await page.type('div.address-box div.d-select-input-filter>input', `${media.province}${media.city}${media.district}`);
+	await new Promise(resolve => setTimeout(resolve, 3000));
+	await page.click('div[data-v-09078844].item');
 	await new Promise(resolve => setTimeout(resolve, 4000 * media.fileArr.length ));
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 4000 }),
