@@ -6,6 +6,12 @@
 		"expires": 2147483646
 	},
 	{
+		"name": "sessionid",
+		"value": "",
+		"domain": ".toutiao.com",
+		"expires": 2147483646
+	},
+	{
 		"name": "userId",
 		"value": "",
 		"domain": ".kuaishou.com",
