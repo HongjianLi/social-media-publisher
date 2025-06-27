@@ -10,7 +10,7 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"exifreader": "^4.31.0",
+		"exifreader": "^4.31.1",
 		"openai": "^4.104.0",
 		"puppeteer-core": "^23.11.1"
 	}
