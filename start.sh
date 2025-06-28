@@ -7,6 +7,8 @@ echo "$(date +"%F %T.%N") node login.js"
 node login.js
 echo "$(date +"%F %T.%N") node douyin.js"
 node douyin.js
+echo "$(date +"%F %T.%N") node toutiao.js"
+node toutiao.js
 echo "$(date +"%F %T.%N") node kuaishou.js"
 node kuaishou.js
 echo "$(date +"%F %T.%N") node xiaohongshu.js"

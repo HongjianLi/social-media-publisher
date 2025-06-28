@@ -16,6 +16,12 @@ const siteArr = [{
 		domain: '.douyin.com',
 	},
 }, {
+	url: 'https://mp.toutiao.com/profile_v4/weitoutiao/publish',
+	cookie: {
+		name: 'sessionid',
+		domain: '.toutiao.com',
+	},
+}, {
 	url: 'https://cp.kuaishou.com/article/publish/video?tabType=2',
 	cookie: {
 		name: 'kuaishou.web.cp.api_st',
