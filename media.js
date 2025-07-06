@@ -7,12 +7,13 @@ const dirArr = (await fs.readdir('Pictures', { withFileTypes: true })).filter(fi
 console.assert(dirArr.length);
 const mediaArr = [];
 for (const dir of dirArr) {
-	const fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.endsWith('.jpg')).map(file => `${file.parentPath}/${file.name}`);
+	const fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.endsWith('.jpg')).map(file => file.name);
 	mediaArr.push(...fileArr.reduce((res, file) => {
 		const date = file.split('_')[1];
 		if (!res.length || res[res.length - 1].date !== date) {
 			res.push({
 				date,
+				dir,
 				fileArr: [file],
 			});
 		} else {
@@ -44,7 +45,7 @@ await Promise.all(mediaArr.map(async (media, index) => {
 		media.fileArr =  media.fileArr.filter((_, idx) => idxArr.includes(idx));
 	}
 	const page = pageArr[index];
-	const exifTags = await ExifReader.load(`${media.fileArr[Math.floor(media.fileArr.length / 2)]}`);
+	const exifTags = await ExifReader.load(`${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`);
 	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&extensions_poi=0&location=${['GPSLatitude', 'GPSLongitude'].map(key => exifTags[key].description).join(',')}`);
 	const revGeo = await revGeoRes.json();
 	await page.close();

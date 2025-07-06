@@ -15,6 +15,7 @@ export default async (url, pageHandler) => {
 		const response = await page.goto(url, { waitUntil: 'networkidle2' });
 		console.assert(response.ok());
 		console.assert(page.url() === url);
+		media.fileArr = media.fileArr.map(file => `${media.dir}/${file}`);
 		await pageHandler(page, media);
 		await new Promise(resolve => setTimeout(resolve, 3000));
 		await page.close();
