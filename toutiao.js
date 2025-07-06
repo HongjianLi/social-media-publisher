@@ -1,19 +1,6 @@
 #!/usr/bin/env node
-import fs from 'fs/promises';
-import puppeteer from 'puppeteer-core';
-const browser = await puppeteer.launch({
-	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-	headless: false,
-	defaultViewport: { width: 1024, height: 768 },
-});
-await fs.readFile('cookies.json').then(JSON.parse).then(cookies => browser.setCookie(...cookies));
-const page = (await browser.pages())[0];
-await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0');
-const url = 'https://mp.toutiao.com/profile_v4/weitoutiao/publish';
-const mediaArr = await fs.readFile('media.json').then(JSON.parse);
-for (const media of mediaArr) {
-	await page.goto(url, { waitUntil: 'networkidle2' });
-	console.assert(page.url() === url);
+import browse from './browser.js';
+browse('https://mp.toutiao.com/profile_v4/weitoutiao/publish', async (page, media) => {
 	await page.click('body'); // Just click anywhere to close the side panel.
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('div.weitoutiao-image-plugin>span>button.syl-toolbar-button');
@@ -30,7 +17,7 @@ for (const media of mediaArr) {
 	await new Promise(resolve => setTimeout(resolve, 8000 * media.fileArr.length));
 	await page.click('button[data-e2e="imageUploadConfirm-btn"]');
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.type('div.ProseMirror', `${media.date}${media.weekday}${media.province}${media.city}${media.district}\n\n${media.description}`);
+	await page.type('div.ProseMirror', `${media.date}${media.weekday}${media.province}${media.city}${media.district}\n\n${media.description}`); // Max 2000 characters.
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('div.byte-select-view');
 	await new Promise(resolve => setTimeout(resolve, 1000));
@@ -42,5 +29,4 @@ for (const media of mediaArr) {
 		page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
 		page.click('button.publish-content'),
 	]);
-}
-await browser.close();
+});

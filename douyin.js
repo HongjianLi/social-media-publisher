@@ -1,22 +1,8 @@
 #!/usr/bin/env node
-import fs from 'fs/promises';
-import puppeteer from 'puppeteer-core';
-const browser = await puppeteer.launch({
-	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-	headless: false,
-	defaultViewport: { width: 1024, height: 768 },
-});
-await fs.readFile('cookies.json').then(JSON.parse).then(cookies => browser.setCookie(...cookies));
-const page = (await browser.pages())[0];
-await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0');
-const url = 'https://creator.douyin.com/creator-micro/content/publish-media/image-text';
-const mediaArr = await fs.readFile('media.json').then(JSON.parse);
-for (const media of mediaArr) { // It seems douyin will detect bot behaviors and logout after publishing two medias.
-	const response = await page.goto(url, { waitUntil: 'networkidle2', timeout: 9000 });
-	console.assert(response.ok());
-	console.assert(page.url() === url);
+import browse from './browser.js';
+browse('https://creator.douyin.com/creator-micro/content/publish-media/image-text', async (page, media) => {
 	await page.type('input[placeholder="添加作品标题"]', `${media.date}${media.weekday}${media.province}${media.city}${media.district}`); // Max 20 characters
-	await page.type('div[data-placeholder="添加作品描述..."]', media.description);
+	await page.type('div[data-placeholder="添加作品描述..."]', media.description); // Max 1000 characters.
 	const [fileChooser] = await Promise.all([
 		page.waitForFileChooser(),
 		page.click('div.container-IRuUu2'),
@@ -31,7 +17,7 @@ for (const media of mediaArr) { // It seems douyin will detect bot behaviors and
 	await page.type('div.select-Ht3mEC', `${media.province}${media.city}${media.district}`);
 	await new Promise(resolve => setTimeout(resolve, 7000));
 	const cityIndex = (await page.$eval('div#scrollContainer', el => el.innerText)).split('\n').indexOf(media.city);
-	await page.click(`div#scrollContainer>div:nth-child(${1 + cityIndex})`); // nth-child is 1-based.
+	await page.click(`div#scrollContainer>div:nth-child(${cityIndex >= 0 ? 1 + cityIndex : 1})`); // nth-child is 1-based. Default to the first city if not found.
 	await new Promise(resolve => setTimeout(resolve, 3000));
 	await page.click('div.option-v2-eZrjiM');
 	await new Promise(resolve => setTimeout(resolve, 5000));
@@ -39,6 +25,4 @@ for (const media of mediaArr) { // It seems douyin will detect bot behaviors and
 		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 8000 }),
 		page.click('button.primary-cECiOJ'),
 	]);
-	await new Promise(resolve => setTimeout(resolve, 5000));
-}
-await browser.close();
+});
