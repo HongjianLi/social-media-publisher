@@ -39,10 +39,10 @@ await Promise.all(mediaArr.map(async (media, index) => {
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	if (media.fileArr.length > m) {
 		const segmentSize = media.fileArr.length / m;
-		const idxArr = [...Array(m).keys()].map(i => {
+		const indexArr = [...Array(m).keys()].map(i => {
 			return Math.round((segmentSize * (2 * i + 1) - 1) / 2);
 		});
-		media.fileArr =  media.fileArr.filter((_, idx) => idxArr.includes(idx));
+		media.fileArr =  media.fileArr.filter((_, index) => indexArr.includes(index));
 	}
 	const page = pageArr[index];
 	const exifTags = await ExifReader.load(`${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`);
