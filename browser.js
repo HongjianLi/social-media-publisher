@@ -13,7 +13,7 @@ export default async (url, pageHandler) => {
 		const page = await browser.newPage();
 		await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0');
 		const response = await page.goto(url, { waitUntil: 'networkidle2' });
-		console.assert(response.ok());
+//		console.assert(response.ok()); // kuaishou would fail this assertion.
 		console.assert(page.url() === url);
 		media.fileArr = media.fileArr.map(file => `${media.dir}/${file}`);
 		media.description = [ ...media.description.poem, ...media.description.sites.map(site => ` \n${site}`) ].join('\n');
