@@ -31,10 +31,6 @@ for (const dir of dirArr) {
 }
 console.assert(mediaArr.length);
 const minorities = ["蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族","哈尼族","哈萨克族","傣族","黎族","傈僳族","佤族","畲族","高山族","拉祜族","水族","东乡族","纳西族","景颇族","柯尔克孜族","土族","达斡尔族","仫佬族","羌族","布朗族","撒拉族","毛南族","仡佬族","锡伯族","阿昌族","普米族","塔吉克族","怒族","乌孜别克族","俄罗斯族","鄂温克族","德昂族","保安族","裕固族","京族","塔塔尔族","独龙族","鄂伦春族","赫哲族","门巴族","珞巴族","基诺族","各族"];
-const openai = new OpenAI({
-	apiKey: process.env.DASHSCOPE_API_KEY,
-	baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-});
 const browser = await puppeteer.launch({
 	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 });
@@ -74,17 +70,29 @@ await Promise.all(mediaArr.map(async (media, index) => {
 	});
 	minorities.forEach(minority => district = district.replace(minority, ''));
 	media.district = district;
+	media.town = town;
+}));
+await browser.close();
+const openai = new OpenAI({
+	apiKey: process.env.DASHSCOPE_API_KEY,
+	baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+});
+for (let i = 0; i < mediaArr.length; ++i) { // Use sequential calls to openai.chat.completions.create(), because parallel calls would hang.
+	const media = mediaArr[i];
+	console.log(i, media.date, media.weekday, media.province, media.city, media.district, media.town);
 	const completion = await openai.chat.completions.create({
 		model: "qwen-turbo", // https://help.aliyun.com/zh/model-studio/what-is-qwen-llm
 		messages: [{
 			"role": "user",
 			"content": [{
 				"type": "text",
-				"text": `列举${province}${city}${district}${town}的三个旅游景点，以及简介、地址、公交路线、下车站点、门票价格、最佳游玩时间。输出自动换行，不需前言后语，不需序号。`,
+				"text": `介绍${media.province}${media.city}${media.district}${media.town}的四个旅游景点。输出JSON。字段poem是字符串数组，包含四句七律诗描绘这些景点，每句包含七个字和一个标点符号。字段sites是字符串数组，包含四句，每句开头是景点的名字，然后用自然语言详细介绍景点、地址、游玩月份。`,
 			}],
 		}],
+		response_format: {
+			type: 'json_object',
+		},
 	});
-	media.description = completion.choices[0].message.content;
-}));
-await browser.close();
+	media.description = JSON.parse(completion.choices[0].message.content);
+}
 await fs.writeFile('media.json', JSON.stringify(mediaArr, null, '	'));
