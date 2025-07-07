@@ -7,7 +7,14 @@ const dirArr = (await fs.readdir('Pictures', { withFileTypes: true })).filter(fi
 console.assert(dirArr.length);
 const mediaArr = [];
 for (const dir of dirArr) {
-	const fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.endsWith('.jpg')).map(file => file.name);
+	let fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.endsWith('.jpg')).map(file => file.name);
+	const filterArr = await Promise.all(fileArr.map(async (file, index) => {
+		const exifTags = await ExifReader.load(`${dir}/${file}`);
+		const imageWidth = exifTags['Image Width'].value;
+		const imageHeight = exifTags['Image Height'].value;
+		return (imageWidth === 3072 && imageHeight === 4096) || (imageWidth === 2448 && imageHeight === 3264); // These resolutions indicate the images were taken by the rear camera, not the front camera, to avoid selfies.
+	}));
+	fileArr = fileArr.filter((_, index) => filterArr[index]);
 	mediaArr.push(...fileArr.reduce((res, file) => {
 		const date = file.split('_')[1];
 		if (!res.length || res[res.length - 1].date !== date) {
