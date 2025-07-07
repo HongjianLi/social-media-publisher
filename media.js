@@ -38,9 +38,6 @@ const openai = new OpenAI({
 const browser = await puppeteer.launch({
 	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 });
-await Promise.all([...Array(mediaArr.length - 1)].map(_ => browser.newPage()));
-const pageArr = await browser.pages();
-console.assert(pageArr.length === mediaArr.length);
 const m = 9; // QQ说说 supports uploading 9 pictures at most. Kuaishou supports uploading 31 pictures. Xiaohongshu and weibo support uploading 18 pictures. Douyin supports uploading 100 pictures.
 await Promise.all(mediaArr.map(async (media, index) => {
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
@@ -51,7 +48,7 @@ await Promise.all(mediaArr.map(async (media, index) => {
 		});
 		media.fileArr =  media.fileArr.filter((_, index) => indexArr.includes(index));
 	}
-	const page = pageArr[index];
+	const page = await browser.newPage();
 	const exifTags = await ExifReader.load(`${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`);
 	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&extensions_poi=0&location=${['GPSLatitude', 'GPSLongitude'].map(key => exifTags[key].description).join(',')}`);
 	const revGeo = await revGeoRes.json();
