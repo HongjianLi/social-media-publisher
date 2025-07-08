@@ -30,7 +30,7 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', async (page, m
 	await page.click('span._button_19mmt_162');
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 4000 }),
+		page.waitForNavigation({ waitUntil: 'networkidle2' }),
 		page.click('div._button-primary_3a3lq_60'),
 	]);
 });

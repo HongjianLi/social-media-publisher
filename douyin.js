@@ -32,7 +32,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.click('button.apply-btn-LUPP0D'); // 使用
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 8000 }),
+		page.waitForNavigation({ waitUntil: 'networkidle2' }),
 		page.click('button.primary-cECiOJ'),
 	]);
 });

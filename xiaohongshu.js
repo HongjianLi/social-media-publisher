@@ -19,7 +19,7 @@ browse('https://creator.xiaohongshu.com/publish/publish', async (page, media) =>
 	await page.click('div[data-v-09078844].item');
 	await new Promise(resolve => setTimeout(resolve, 4000 * media.fileArr.length ));
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 4000 }),
+		page.waitForNavigation({ waitUntil: 'networkidle2' }),
 		page.click('div.submit>button'),
 	]);
 });
