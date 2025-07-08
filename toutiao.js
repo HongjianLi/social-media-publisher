@@ -21,7 +21,7 @@ browse('https://mp.toutiao.com/profile_v4/weitoutiao/publish', async (page, medi
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('div.byte-select-view');
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.type('span.byte-select-view-search>input', `${media.province}${media.city}${media.district}`);
+	await page.type('span.byte-select-view-search>input', `${media.province}${media.city}${media.district}`); // Custom location is supported.
 	await new Promise(resolve => setTimeout(resolve, 5000));
 	await page.click('ul.byte-select-popup-inner>li:nth-child(1)');
 	await new Promise(resolve => setTimeout(resolve, 1000));

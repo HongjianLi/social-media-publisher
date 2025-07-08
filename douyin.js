@@ -16,7 +16,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.type('div.select-Ht3mEC', `${media.province}${media.city}${media.district}`);
 	await new Promise(resolve => setTimeout(resolve, 7000));
-	const cityIndex = (await page.$eval('div#scrollContainer', el => el.innerText)).split('\n').indexOf(media.city);
+	const cityIndex = (await page.$eval('div#scrollContainer', el => el.innerText)).split('\n').indexOf(media.city); // Custom location is not supported.
 	await page.click(`div#scrollContainer>div:nth-child(${cityIndex >= 0 ? 1 + cityIndex : 1})`); // nth-child is 1-based. Default to the first city if not found.
 	await new Promise(resolve => setTimeout(resolve, 3000));
 	await page.click('div.option-v2-eZrjiM');
