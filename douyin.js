@@ -20,7 +20,17 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.click(`div#scrollContainer>div:nth-child(${cityIndex >= 0 ? 1 + cityIndex : 1})`); // nth-child is 1-based. Default to the first city if not found.
 	await new Promise(resolve => setTimeout(resolve, 3000));
 	await page.click('div.option-v2-eZrjiM');
-	await new Promise(resolve => setTimeout(resolve, 5000));
+	await new Promise(resolve => setTimeout(resolve, 1000));
+	await page.click('span.action-Q1y01k');
+	await new Promise(resolve => setTimeout(resolve, 2000));
+	await page.type('input[placeholder="搜索音乐"]', '先敬罗衣后敬人 许冠杰');
+	await new Promise(resolve => setTimeout(resolve, 2000));
+	await page.waitForSelector('div.card-wrapper-JTleG1');
+	await new Promise(resolve => setTimeout(resolve, 1000));
+	await page.click('div.card-wrapper-JTleG1');
+	await new Promise(resolve => setTimeout(resolve, 1000));
+	await page.click('button.apply-btn-LUPP0D'); // 使用
+	await new Promise(resolve => setTimeout(resolve, 2000));
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 8000 }),
 		page.click('button.primary-cECiOJ'),

@@ -21,6 +21,14 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', async (page, m
 //	await page.click('input#rc_select_2'); // 详细地址
 //	await new Promise(resolve => setTimeout(resolve, 3000));
 //	await page.click('div.rc-virtual-list-holder-inner>div:nth-child(1)');
+	await page.click('div._icon-add_3a3lq_27'); // 添加音乐
+	await new Promise(resolve => setTimeout(resolve, 2000));
+	await page.type('input._search-input_19mmt_16', '先敬罗衣后敬人 许冠杰');
+	await new Promise(resolve => setTimeout(resolve, 2000));
+	await page.waitForSelector('span._button_19mmt_162'); // 添加
+	await new Promise(resolve => setTimeout(resolve, 1000));
+	await page.click('span._button_19mmt_162');
+	await new Promise(resolve => setTimeout(resolve, 2000));
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 4000 }),
 		page.click('div._button-primary_3a3lq_60'),
