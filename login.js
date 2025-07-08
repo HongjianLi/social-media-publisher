@@ -8,9 +8,9 @@ const browser = await puppeteer.launch({
 	defaultViewport: { width: 1024, height: 768 },
 });
 await browser.setCookie(...cookies);
-const page = (await browser.pages())[0];
 const siteArr = [{
 	url: 'https://creator.douyin.com/creator-micro/content/publish-media/image-text',
+	selector: 'span.selected-w_E01s',
 	cookie: {
 		name: 'sessionid',
 		domain: '.douyin.com',
@@ -23,6 +23,7 @@ const siteArr = [{
 	},
 }, {
 	url: 'https://cp.kuaishou.com/article/publish/video?tabType=2',
+	selector: 'a.login',
 	cookie: {
 		name: 'kuaishou.web.cp.api_st',
 		domain: '.kuaishou.com',
@@ -48,16 +49,18 @@ const siteArr = [{
 }];
 for (const site of siteArr) {
 	const { url, cookie: { name, domain } } = site;
-	const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 22000 });
+	const page = await browser.newPage();
+	const response = await page.goto(url, { waitUntil: 'networkidle2' });
 	if (response.ok()) {
-		if (page.url() !== url) { // Page redirected because of invalid cookies for user login.
+		if (page.url() !== url || (site.selector && await page.$(site.selector))) { // Page redirected because of invalid cookies for user login. douyin and kuaishou will not redirect, but login selectors will be found.
 			await page.waitForNavigation(); // Scan QR code to login. Default timeout is 30 seconds.
 			const cookie = await browser.cookies().then(cookies => cookies.find(cookie => cookie.name === name && cookie.domain === domain)); // After login, find the credential cookie.
-			cookies.find(cookie => cookie.name === name && cookie.domain === domain).value = cookie.value; // Save the credential cookie value.
+			if (cookie) cookies.find(cookie => cookie.name === name && cookie.domain === domain).value = cookie.value; // Save the credential cookie value.
 		}
 	} else {
 		console.error(`HTTP response status code ${response.status()}`);
 	}
+	await page.close();
 }
 await browser.close();
 await fs.writeFile('cookies.json', JSON.stringify(cookies, null, '	'));
