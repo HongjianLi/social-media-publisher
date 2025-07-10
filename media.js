@@ -34,7 +34,7 @@ const minorities = ["蒙古族","回族","藏族","维吾尔族","苗族","彝�
 const browser = await puppeteer.launch({
 	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 });
-const m = 9; // QQ说说 supports uploading 9 pictures at most. Kuaishou supports uploading 31 pictures. toutiao, xiaohongshu and weibo support uploading 18 pictures. Douyin supports uploading 100 pictures.
+const m = 9; // QQ说说 supports uploading 9 pictures at most. Kuaishou supports uploading 31 pictures. toutiao, xiaohongshu and weibo support uploading 18 pictures. Douyin supports uploading 35 pictures.
 await Promise.all(mediaArr.map(async (media, index) => {
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	if (media.fileArr.length > m) {
