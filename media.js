@@ -34,16 +34,8 @@ const minorities = ["蒙古族","回族","藏族","维吾尔族","苗族","彝�
 const browser = await puppeteer.launch({
 	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 });
-const m = 9; // QQ说说 supports uploading 9 pictures at most. Kuaishou supports uploading 31 pictures. toutiao, xiaohongshu and weibo support uploading 18 pictures. Douyin supports uploading 35 pictures.
 await Promise.all(mediaArr.map(async (media, index) => {
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
-	if (media.fileArr.length > m) {
-		const segmentSize = media.fileArr.length / m;
-		const indexArr = [...Array(m).keys()].map(i => {
-			return Math.round((segmentSize * (2 * i + 1) - 1) / 2);
-		});
-		media.fileArr =  media.fileArr.filter((_, index) => indexArr.includes(index));
-	}
 	const page = await browser.newPage();
 	const exifTags = await ExifReader.load(`${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`);
 	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&extensions_poi=0&location=${['GPSLatitude', 'GPSLongitude'].map(key => exifTags[key].description).join(',')}`);
@@ -77,9 +69,8 @@ const openai = new OpenAI({
 	apiKey: process.env.DASHSCOPE_API_KEY,
 	baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
 });
-for (let i = 0; i < mediaArr.length; ++i) { // Use sequential calls to openai.chat.completions.create(), because parallel calls would hang.
-	const media = mediaArr[i];
-	console.log(i, media.date, media.weekday, media.province, media.city, media.district, media.town);
+for (const media of mediaArr) {// Use sequential calls to openai.chat.completions.create(), because parallel calls would hang.
+	console.log(media.date, media.weekday, media.province, media.city, media.district, media.town);
 	const completion = await openai.chat.completions.create({
 		model: "qwen-turbo", // https://help.aliyun.com/zh/model-studio/what-is-qwen-llm
 		messages: [{
@@ -94,5 +85,8 @@ for (let i = 0; i < mediaArr.length; ++i) { // Use sequential calls to openai.ch
 		},
 	});
 	media.description = JSON.parse(completion.choices[0].message.content);
+	const { poem } = media.description;
+	console.assert(poem.length === 4, ['poem.length === 4', poem.length].join('	'));
+	poem.forEach(sentence => console.assert(sentence.length === 8, ['sentence.length === 8', sentence.length].join('	')));
 }
 await fs.writeFile('media.json', JSON.stringify(mediaArr, null, '	'));

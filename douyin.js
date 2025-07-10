@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import browse from './browser.js';
-browse('https://creator.douyin.com/creator-micro/content/publish-media/image-text', async (page, media) => {
+browse('https://creator.douyin.com/creator-micro/content/publish-media/image-text', 35, async (page, media) => { // Max 35 pictures.
 	await page.type('input[placeholder="添加作品标题"]', `${media.date}${media.weekday}${media.province}${media.city}${media.district}`); // Max 20 characters
 	await page.type('div[data-placeholder="添加作品描述..."]', media.description); // Max 1000 characters.
 	const [fileChooser] = await Promise.all([
