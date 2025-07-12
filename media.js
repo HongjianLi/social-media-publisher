@@ -38,7 +38,17 @@ await Promise.all(mediaArr.map(async (media, index) => {
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	const page = await browser.newPage();
 	const exifTags = await ExifReader.load(`${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`);
-	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&extensions_poi=0&location=${['GPSLatitude', 'GPSLongitude'].map(key => exifTags[key].description).join(',')}`);
+	const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitudeRef, GPSAltitude } = exifTags;
+	console.assert(GPSLatitudeRef.id === 1 && GPSLatitudeRef.value.length === 1 && GPSLatitudeRef.value[0] === 'N' && GPSLatitudeRef.description === 'North latitude', GPSLatitudeRef);
+	console.assert(GPSLatitude.id === 2 && GPSLatitude.value.length === 3 && GPSLatitude.value.every(v => v.length === 2) && GPSLatitude.value[0][1] === 1 && GPSLatitude.value[1][1] === 1 && GPSLatitude.value[2][1] === 100 && GPSLatitude.value[0][0] >= 0 && GPSLatitude.value[0][0] < 90, GPSLatitude);
+	console.assert(GPSLongitudeRef.id === 3 && GPSLongitudeRef.value.length === 1 && GPSLongitudeRef.value[0] === 'E' && GPSLongitudeRef.description === 'East longitude', GPSLongitudeRef);
+	console.assert(GPSLongitude.id === 4 && GPSLongitude.value.length === 3 && GPSLongitude.value.every(v => v.length === 2) && GPSLongitude.value[0][1] === 1 && GPSLongitude.value[1][1] === 1 && GPSLongitude.value[2][1] === 100 && GPSLongitude.value[0][0] >= 0 && GPSLongitude.value[0][0] < 180, GPSLongitude);
+	console.assert(GPSAltitudeRef.id === 5 && GPSAltitudeRef.value === 0 && GPSAltitudeRef.description === 'Sea level', GPSAltitudeRef);
+	console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] === 1 && GPSAltitude.value[0] >= 0, GPSAltitude);
+	media.latitude = `北纬${GPSLatitude.value[0][0]/GPSLatitude.value[0][1]}°${GPSLatitude.value[1][0]/GPSLatitude.value[1][1]}'${(GPSLatitude.value[2][0]/GPSLatitude.value[2][1]).toFixed(2)}"N`;
+	media.longitude = `东经${GPSLongitude.value[0][0]/GPSLongitude.value[0][1]}°${GPSLongitude.value[1][0]/GPSLongitude.value[1][1]}'${(GPSLongitude.value[2][0]/GPSLongitude.value[2][1]).toFixed(2)}"E`;
+	media.altitude = `海拔${GPSAltitude.value[0]}米`;
+	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&extensions_poi=0&location=${GPSLatitude.description},${GPSLongitude.description}`);
 	const revGeo = await revGeoRes.json();
 	await page.close();
 	console.assert(revGeo.status === 0);
