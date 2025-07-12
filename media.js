@@ -7,7 +7,7 @@ const dirArr = (await fs.readdir('Pictures', { withFileTypes: true })).filter(fi
 console.assert(dirArr.length);
 const mediaArr = [];
 for (const dir of dirArr) {
-	let fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.endsWith('.jpg')).map(file => file.name);
+	let fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.startsWith('IMG_') && file.name.endsWith('.jpg')).map(file => file.name);
 	const filterArr = await Promise.all(fileArr.map(async (file, index) => {
 		const exifTags = await ExifReader.load(`${dir}/${file}`);
 		const imageWidth = exifTags['Image Width'].value;
