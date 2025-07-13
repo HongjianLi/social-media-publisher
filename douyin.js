@@ -46,7 +46,8 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('span.action-Q1y01k'); // 选择音乐
 	await new Promise(resolve => setTimeout(resolve, 2000));
-	await page.type('input[placeholder="搜索音乐"]', '先敬罗衣后敬人 许冠杰'); // 搜索音乐
+	await page.click('div[data-scrollkey="fav-1-bar"]'); // 收藏
+//	await page.type('input[placeholder="搜索音乐"]', '先敬罗衣后敬人 许冠杰'); // 搜索音乐
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.waitForSelector('div.card-wrapper-JTleG1'); // 等待加载音乐
 	await new Promise(resolve => setTimeout(resolve, 1000));
