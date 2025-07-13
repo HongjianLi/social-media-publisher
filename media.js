@@ -4,11 +4,12 @@ import ExifReader from 'exifreader';
 import puppeteer from 'puppeteer-core';
 import OpenAI from 'openai';
 const dirArr = (await fs.readdir('Pictures', { withFileTypes: true })).filter(file => file.isDirectory()).map(file => `${file.parentPath}/${file.name}`);
+console.log(`Found ${dirArr.length} directories.`);
 console.assert(dirArr.length);
 const mediaArr = [];
 for (const dir of dirArr) {
 	let fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.startsWith('IMG_') && file.name.endsWith('.jpg')).map(file => file.name);
-	const filterArr = await Promise.all(fileArr.map(async (file, index) => {
+	const filterArr = await Promise.all(fileArr.map(async (file) => {
 		const exifTags = await ExifReader.load(`${dir}/${file}`);
 		const imageWidth = exifTags['Image Width'].value;
 		const imageHeight = exifTags['Image Height'].value;
@@ -29,22 +30,24 @@ for (const dir of dirArr) {
 		return res;
 	}, []));
 }
+console.log(`Expanded to ${mediaArr.length} medias.`);
 console.assert(mediaArr.length);
 const minorities = ["蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族","哈尼族","哈萨克族","傣族","黎族","傈僳族","佤族","畲族","高山族","拉祜族","水族","东乡族","纳西族","景颇族","柯尔克孜族","土族","达斡尔族","仫佬族","羌族","布朗族","撒拉族","毛南族","仡佬族","锡伯族","阿昌族","普米族","塔吉克族","怒族","乌孜别克族","俄罗斯族","鄂温克族","德昂族","保安族","裕固族","京族","塔塔尔族","独龙族","鄂伦春族","赫哲族","门巴族","珞巴族","基诺族","各族"];
 const browser = await puppeteer.launch({
 	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 });
-await Promise.all(mediaArr.map(async (media, index) => {
+await Promise.all(mediaArr.map(async (media) => {
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	const page = await browser.newPage();
-	const exifTags = await ExifReader.load(`${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`);
+	const file = `${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`;
+	const exifTags = await ExifReader.load(file);
 	const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitudeRef, GPSAltitude } = exifTags;
-	console.assert(GPSLatitudeRef.id === 1 && GPSLatitudeRef.value.length === 1 && GPSLatitudeRef.value[0] === 'N' && GPSLatitudeRef.description === 'North latitude', GPSLatitudeRef);
-	console.assert(GPSLatitude.id === 2 && GPSLatitude.value.length === 3 && GPSLatitude.value.every(v => v.length === 2) && GPSLatitude.value[0][1] === 1 && GPSLatitude.value[1][1] === 1 && GPSLatitude.value[2][1] === 100 && GPSLatitude.value[0][0] >= 0 && GPSLatitude.value[0][0] < 90, GPSLatitude);
-	console.assert(GPSLongitudeRef.id === 3 && GPSLongitudeRef.value.length === 1 && GPSLongitudeRef.value[0] === 'E' && GPSLongitudeRef.description === 'East longitude', GPSLongitudeRef);
-	console.assert(GPSLongitude.id === 4 && GPSLongitude.value.length === 3 && GPSLongitude.value.every(v => v.length === 2) && GPSLongitude.value[0][1] === 1 && GPSLongitude.value[1][1] === 1 && GPSLongitude.value[2][1] === 100 && GPSLongitude.value[0][0] >= 0 && GPSLongitude.value[0][0] < 180, GPSLongitude);
-	console.assert(GPSAltitudeRef.id === 5 && GPSAltitudeRef.value === 0 && GPSAltitudeRef.description === 'Sea level', GPSAltitudeRef);
-	console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] === 1 && GPSAltitude.value[0] >= 0, GPSAltitude);
+	console.assert(GPSLatitudeRef.id === 1 && GPSLatitudeRef.value.length === 1 && GPSLatitudeRef.value[0] === 'N' && GPSLatitudeRef.description === 'North latitude', [file, GPSLatitudeRef]);
+	console.assert(GPSLatitude.id === 2 && GPSLatitude.value.length === 3 && GPSLatitude.value.every(v => v.length === 2) && GPSLatitude.value[0][1] === 1 && GPSLatitude.value[1][1] === 1 && [ 1, 100 ].includes(GPSLatitude.value[2][1]) && GPSLatitude.value[0][0] >= 0 && GPSLatitude.value[0][0] < 90, [file, GPSLatitude]);
+	console.assert(GPSLongitudeRef.id === 3 && GPSLongitudeRef.value.length === 1 && GPSLongitudeRef.value[0] === 'E' && GPSLongitudeRef.description === 'East longitude', [file, GPSLongitudeRef]);
+	console.assert(GPSLongitude.id === 4 && GPSLongitude.value.length === 3 && GPSLongitude.value.every(v => v.length === 2) && GPSLongitude.value[0][1] === 1 && GPSLongitude.value[1][1] === 1 && GPSLongitude.value[2][1] === 100 && GPSLongitude.value[0][0] >= 0 && GPSLongitude.value[0][0] < 180, [file, GPSLongitude]);
+	console.assert(GPSAltitudeRef.id === 5 && ((GPSAltitudeRef.value === 0 && GPSAltitudeRef.description === 'Sea level') || (GPSAltitudeRef.value === 1 && GPSAltitudeRef.description === 'Sea level reference (negative value)')), [file, GPSAltitudeRef]);
+	console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] === 1 && GPSAltitude.value[0] >= 0, [file, GPSAltitude]);
 	media.latitude = `北纬${GPSLatitude.value[0][0]/GPSLatitude.value[0][1]}°${GPSLatitude.value[1][0]/GPSLatitude.value[1][1]}'${(GPSLatitude.value[2][0]/GPSLatitude.value[2][1]).toFixed(2)}"N`;
 	media.longitude = `东经${GPSLongitude.value[0][0]/GPSLongitude.value[0][1]}°${GPSLongitude.value[1][0]/GPSLongitude.value[1][1]}'${(GPSLongitude.value[2][0]/GPSLongitude.value[2][1]).toFixed(2)}"E`;
 	media.altitude = `海拔${GPSAltitude.value[0]}米`;
