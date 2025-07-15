@@ -33,10 +33,14 @@ for (const dir of dirArr) {
 console.log(`Expanded to ${mediaArr.length} medias.`);
 console.assert(mediaArr.length);
 const minorities = ["蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族","哈尼族","哈萨克族","傣族","黎族","傈僳族","佤族","畲族","高山族","拉祜族","水族","东乡族","纳西族","景颇族","柯尔克孜族","土族","达斡尔族","仫佬族","羌族","布朗族","撒拉族","毛南族","仡佬族","锡伯族","阿昌族","普米族","塔吉克族","怒族","乌孜别克族","俄罗斯族","鄂温克族","德昂族","保安族","裕固族","京族","塔塔尔族","独龙族","鄂伦春族","赫哲族","门巴族","珞巴族","基诺族","各族"];
+const openai = new OpenAI({
+	apiKey: process.env.DASHSCOPE_API_KEY,
+	baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+});
 const browser = await puppeteer.launch({
 	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 });
-await Promise.all(mediaArr.map(async (media) => {
+for (const media of mediaArr) {// Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding would exhaust its concurrency limit, and parallel calls to openai.chat.completions.create() would hang.
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	const file = `${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`;
 	const exifTags = await ExifReader.load(file);
@@ -76,13 +80,6 @@ await Promise.all(mediaArr.map(async (media) => {
 	minorities.forEach(minority => district = district.replace(minority, ''));
 	media.district = district;
 	media.town = town;
-}));
-await browser.close();
-const openai = new OpenAI({
-	apiKey: process.env.DASHSCOPE_API_KEY,
-	baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-});
-for (const media of mediaArr) {// Use sequential calls to openai.chat.completions.create(), because parallel calls would hang.
 	console.log(media.date, media.weekday, media.province, media.city, media.district, media.town);
 	const completion = await openai.chat.completions.create({
 		model: "qwen-turbo", // https://help.aliyun.com/zh/model-studio/what-is-qwen-llm
@@ -102,4 +99,5 @@ for (const media of mediaArr) {// Use sequential calls to openai.chat.completion
 	console.assert(poem.length === 4, ['poem.length === 4', poem.length].join('	'));
 	poem.forEach(sentence => console.assert(sentence.length === 8, ['sentence.length === 8', sentence.length].join('	')));
 }
+await browser.close();
 await fs.writeFile('media.json', JSON.stringify(mediaArr, null, '	'));
