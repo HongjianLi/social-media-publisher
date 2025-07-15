@@ -55,7 +55,7 @@ for (const media of mediaArr) {// Use sequential loop instead of promise.all, be
 	media.longitude = `东经${GPSLongitude.value[0][0]/GPSLongitude.value[0][1]}°${GPSLongitude.value[1][0]/GPSLongitude.value[1][1]}'${(GPSLongitude.value[2][0]/GPSLongitude.value[2][1]).toFixed(2)}"E`;
 	media.altitude = `海拔${GPSAltitude.value[0]}米`;
 	const page = await browser.newPage();
-	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&extensions_poi=0&location=${GPSLatitude.description},${GPSLongitude.description}`);
+	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&extensions_poi=0&location=${GPSLatitude.description},${GPSLongitude.description}`); // Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
 	const revGeo = await revGeoRes.json();
 	await page.close();
 	console.assert(revGeo.status === 0);
