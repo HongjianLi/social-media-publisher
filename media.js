@@ -17,7 +17,7 @@ for (const dir of dirArr) {
 	}));
 	fileArr = fileArr.filter((_, index) => filterArr[index]);
 	mediaArr.push(...fileArr.reduce((res, file) => {
-		const date = file.split('_')[1];
+		const date = file.substring(4, 12);
 		if (!res.length || res[res.length - 1].date !== date) {
 			res.push({
 				date,
