@@ -98,8 +98,8 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 	});
 	media.description = JSON.parse(completion.choices[0].message.content);
 	const { poem } = media.description;
-	console.assert(poem.length === 4, ['poem.length === 4', poem.length].join('	'));
-	poem.forEach(sentence => console.assert(sentence.length === 8, ['sentence.length === 8', sentence.length].join('	')));
+	console.assert(poem.length === 4, 'poem.length', poem.length, '!==', 4);
+	poem.forEach(sentence => console.assert(sentence.length === 8, 'sentence.length', sentence.length, '!==', 8));
 }
 await browser.close();
 await fs.writeFile('media.json', JSON.stringify(mediaArr, null, '	'));
