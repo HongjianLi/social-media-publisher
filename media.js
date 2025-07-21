@@ -58,7 +58,7 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&location=${GPSLatitude.description},${GPSLongitude.description}`); // API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base  Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
 	const revGeo = await revGeoRes.json();
 	await page.close();
- 	if (revGeo.status !== 0) {
+	if (revGeo.status !== 0) {
 		console.error(`revGeo.status`, revGeo.status); // 1: 服务器内部错误; 302: 天配额超限，限制访问; 401: 当前并发量已经超过约定并发配额，限制访问;
 		break;
 	}
@@ -102,5 +102,5 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 	console.assert(poem.length === 4, 'poem.length', poem.length, '!==', 4);
 	poem.forEach(sentence => console.assert(sentence.length === 8, 'sentence.length', sentence.length, '!==', 8));
 }
-await browser.close();
 await fs.writeFile('media.json', JSON.stringify(mediaArr, null, '	'));
+await browser.close();
