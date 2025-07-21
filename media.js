@@ -41,6 +41,7 @@ const browser = await puppeteer.launch({
 });
 for (const media of mediaArr) { // Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding would exhaust its concurrency limit, and parallel calls to openai.chat.completions.create() would hang.
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
+	console.log(media.dir, media.date, media.weekday);
 	const file = `${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`;
 	const exifTags = await ExifReader.load(file);
 	const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitudeRef, GPSAltitude } = exifTags;
@@ -82,7 +83,7 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 	minorities.forEach(minority => district = district.replace(minority, ''));
 	media.district = district;
 	media.town = town;
-	console.log(media.date, media.weekday, media.province, media.city, media.district, media.town);
+	console.log(media.province, media.city, media.district, media.town);
 	const completion = await openai.chat.completions.create({
 		model: "qwen-turbo", // https://help.aliyun.com/zh/model-studio/what-is-qwen-llm
 		messages: [{
