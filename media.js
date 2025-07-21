@@ -20,13 +20,12 @@ for (const dir of dirArr) {
 		const date = file.substring(4, 12);
 		if (!res.length || res[res.length - 1].date !== date) {
 			res.push({
-				date,
 				dir,
-				fileArr: [file],
+				date,
+				fileArr: [],
 			});
-		} else {
-			res[res.length - 1].fileArr.push(file);
 		}
+		res[res.length - 1].fileArr.push(file);
 		return res;
 	}, []));
 }
