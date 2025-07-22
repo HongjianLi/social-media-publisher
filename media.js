@@ -6,18 +6,11 @@ import OpenAI from 'openai';
 const dirArr = (await fs.readdir('Pictures', { withFileTypes: true })).filter(file => file.isDirectory()).map(file => `${file.parentPath}/${file.name}`);
 console.log(`Found ${dirArr.length} directories.`);
 console.assert(dirArr.length);
-const mediaArr = [];
+let mediaArr = [];
 for (const dir of dirArr) {
-	let fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.length >= 23 && file.name.startsWith('IMG_') && file.name.endsWith('.jpg')).map(file => file.name); // file.name should look like IMG_YYYYmmdd_HHMMSS(_HDR)?.jpg
-	const filterArr = await Promise.all(fileArr.map(async (file) => {
-		const exifTags = await ExifReader.load(`${dir}/${file}`);
-		const imageWidth = exifTags['Image Width'].value;
-		const imageHeight = exifTags['Image Height'].value;
-		return (imageWidth === 3072 && imageHeight === 4096) || (imageWidth === 2448 && imageHeight === 3264); // These resolutions indicate the images were taken by the rear camera, not the front camera, to avoid selfies.
-	}));
-	fileArr = fileArr.filter((_, index) => filterArr[index]);
+	const fileArr = (await fs.readdir(dir, { withFileTypes: true })).filter(file => file.isFile() && file.name.length >= 23 && file.name.startsWith('IMG_') && (file.name.endsWith('.jpg') || file.name.endsWith('.HEIC')) && file.name.substring(19, 26) !== '_STEREO')/*.map(file => file.name)*/; // file.name should look like IMG_YYYYmmdd_HHMMSS(_HDR)?.{jpg,HEIC}
 	mediaArr.push(...fileArr.reduce((res, file) => {
-		const date = file.substring(4, 12);
+		const date = file.name.substring(4, 12);
 		if (!res.length || res[res.length - 1].date !== date) {
 			res.push({
 				dir,
@@ -42,15 +35,61 @@ const browser = await puppeteer.launch({
 for (const media of mediaArr) { // Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding would exhaust its concurrency limit, and parallel calls to openai.chat.completions.create() would hang.
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	console.log(media.dir, media.date, media.weekday);
-	const file = `${media.dir}/${media.fileArr[Math.floor(media.fileArr.length / 2)]}`;
-	const exifTags = await ExifReader.load(file);
+	await Promise.all(media.fileArr.map(async (file) => {
+		const exifTags = await ExifReader.load(`${media.dir}/${file.name}`);
+		const model = exifTags.Model.description;
+		console.assert(['iQOO Neo8 Pro', 'Redmi K30 Pro', 'Redmi Note 5', 'Redmi Pro', 'Redmi Note 2'].includes(model), 'Unknown model:', model);
+		const orientation = exifTags['Orientation'];
+		console.assert(orientation.id === 274);
+		console.assert([0, 1, 3, 6, 8].includes(orientation.value), file.name, model, orientation);
+		if (!(
+			(model === 'iQOO Neo8 Pro' && ((orientation.value === 0 && orientation.description === 'Undefined'))) || // Other values are { id: 274, value: 1, description: 'top-left' }, { id: 274, value: 6, description: 'right-top' }
+			(model === 'Redmi K30 Pro' && ((orientation.value === 6 && orientation.description === 'right-top'))) || // Other values are { id: 274, value: 1, description: 'top-left' }, { id: 274, value: 3, description: 'bottom-right' }, { id: 274, value: 8, description: 'left-bottom' }
+			(model === 'Redmi Note 5'  && ((orientation.value === 6 && orientation.description === 'right-top'))) ||
+			(model === 'Redmi Pro'     && ((orientation.value === 0 && orientation.description === 'Undefined') || (orientation.value === 1 && orientation.description === 'top-left'))) ||
+			(model === 'Redmi Note 2'  && ((orientation.value === 1 && orientation.description === 'top-left')))
+		)) return; // Keep portrait orientation only. Discard landscape orientation and panorama.
+		// Images taken by iQOO Neo8 Pro have ImageWidth and 'Image Width'. Images taken by Redmi K30 Pro all have ImageWidth, but only some have 'Image Width'. Images taken by Redmi Note 5, Redmi Pro, Redmi Note 2 have 'Image Width' but not ImageWidth.
+		const width = exifTags['ImageWidth'] ? exifTags['ImageWidth'].value : exifTags['Image Width'].value;
+		const height = exifTags['ImageLength'] ? exifTags['ImageLength'].value : exifTags['Image Height'].value;
+		console.assert(
+			(model === 'iQOO Neo8 Pro' && ((width === 3072 && height === 4096) || (width === 2448 && height === 3264) || (width === 4096 && height === 3072) || (width === 3456 && height === 4608))) || // (width === 4096 && height === 3072) is landscape orientation. (width === 3456 && height === 4608) was taken by front camera.
+			(model === 'Redmi K30 Pro' && ((width === 4624 && height === 3472) || (width === 4208 && height === 3120) || (width === 3296 && height === 2472) || (width === 9248 && height === 6944))) || // (width === 9248 && height === 6944) is portrait orientation and taken by rear camera, but has a pretty large file size, e.g. 27MB.
+			(model === 'Redmi Note 5'  && ((width === 4000 && height === 3000))) ||
+			(model === 'Redmi Pro'     && ((width === 3120 && height === 4160) || (width === 2368 && height === 4208) || (width === 4160 && height === 3120) || (width === 4208 && height === 2368))) || // (width === 4160 && height === 3120) is landscape orientation. (width === 4208 && height === 2368) is landscape orientation.
+			(model === 'Redmi Note 2'  && ((width === 3120 && height === 4160) || (width === 4160 && height === 3120))) // (width === 4160 && height === 3120) is landscape orientation.
+		, file.name, model, orientation, width, height);
+		if (!(
+			(model === 'iQOO Neo8 Pro' && ((width === 3072 && height === 4096) || (width === 2448 && height === 3264))) ||
+			(model === 'Redmi K30 Pro' && ((width === 4624 && height === 3472) || (width === 4208 && height === 3120) || (width === 3296 && height === 2472))) ||
+			(model === 'Redmi Note 5'  && ((width === 4000 && height === 3000))) ||
+			(model === 'Redmi Pro'     && ((width === 3120 && height === 4160) || (width === 2368 && height === 4208))) ||
+			(model === 'Redmi Note 2'  && ((width === 3120 && height === 4160)))
+		)) return; // Keep portrait orientation and rear camera only. Discard front camera.
+		file.resolutionOK = true;
+		file.gpsOK = exifTags.GPSLatitude !== undefined;
+	}));
+	media.fileArr = media.fileArr.filter(file => file.resolutionOK);
+	if (!media.fileArr.length) {
+		console.log('Resolution not OK');
+		continue;
+	}
+	const fileGpsArr = media.fileArr.filter(file => file.gpsOK).map(file => file.name);
+	media.fileArr = media.fileArr.map(file => `${file.name.split('.')[0]}.jpg`); // Change the extension name to .jpg
+	if (!fileGpsArr.length) {
+		console.log('GPS not found');
+		continue;
+	}
+	const file = fileGpsArr[Math.floor(fileGpsArr.length / 2)]; // This is the file where GPS tags will be retrieved from.
+	const exifTags = await ExifReader.load(`${media.dir}/${file}`);
 	const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitudeRef, GPSAltitude } = exifTags;
 	console.assert(GPSLatitudeRef.id === 1 && GPSLatitudeRef.value.length === 1 && GPSLatitudeRef.value[0] === 'N' && GPSLatitudeRef.description === 'North latitude', file, GPSLatitudeRef);
 	console.assert(GPSLatitude.id === 2 && GPSLatitude.value.length === 3 && GPSLatitude.value.every(v => v.length === 2) && GPSLatitude.value[0][1] === 1 && GPSLatitude.value[1][1] === 1 && GPSLatitude.value[2][1] > 0 && GPSLatitude.value[0][0] >= 0 && GPSLatitude.value[0][0] < 90, file, GPSLatitude); // GPSLatitude.value[2][1] could be 1, 100, 3286, 1000000.
 	console.assert(GPSLongitudeRef.id === 3 && GPSLongitudeRef.value.length === 1 && GPSLongitudeRef.value[0] === 'E' && GPSLongitudeRef.description === 'East longitude', file, GPSLongitudeRef);
 	console.assert(GPSLongitude.id === 4 && GPSLongitude.value.length === 3 && GPSLongitude.value.every(v => v.length === 2) && GPSLongitude.value[0][1] === 1 && GPSLongitude.value[1][1] === 1 && GPSLongitude.value[2][1] > 0 && GPSLongitude.value[0][0] >= 0 && GPSLongitude.value[0][0] < 180, file, GPSLongitude); // GPSLongitude.value[2][1] could be 100, 625, 1000000.
 	console.assert(GPSAltitudeRef.id === 5 && ((GPSAltitudeRef.value === 0 && GPSAltitudeRef.description === 'Sea level') || (GPSAltitudeRef.value === 1 && GPSAltitudeRef.description === 'Sea level reference (negative value)')), file, GPSAltitudeRef);
-	console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] > 0 && GPSAltitude.value[0] >= 0, file, GPSAltitude);
+	console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] > 0 && GPSAltitude.value[0] >= 0 && GPSAltitude.value[0] < 9000000, file, GPSAltitude); // Computed altitude should be < 9000 m. The unit can be 1 or 1000.
+	media.file = file;
 	media.latitude = `北纬${GPSLatitude.value[0][0]/GPSLatitude.value[0][1]}°${GPSLatitude.value[1][0]/GPSLatitude.value[1][1]}'${(GPSLatitude.value[2][0]/GPSLatitude.value[2][1]).toFixed(2)}"N`;
 	media.longitude = `东经${GPSLongitude.value[0][0]/GPSLongitude.value[0][1]}°${GPSLongitude.value[1][0]/GPSLongitude.value[1][1]}'${(GPSLongitude.value[2][0]/GPSLongitude.value[2][1]).toFixed(2)}"E`;
 	media.altitude = `海拔${(GPSAltitude.value[0]/GPSAltitude.value[1]).toFixed(0)}米`;
@@ -77,11 +116,18 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 	});
 	minorities.forEach(minority => city = city.replace(minority, ''));
 	media.city = city;
+	if (town === district) town = ''; // Avoid duplicate.
 	['自治县', '特区', '林区', '新区', '市', '县', '区'].forEach(c => { // Note the order of 县 and 区 in order to correctly shorten 梅州梅县区, 赣州赣县区, 攀枝花东区, 攀枝花西区
 		if (district.length >= 2 + c.length && district.endsWith(c)) district = district.slice(0, -c.length); // Avoid 城区,东区,西区 being shortened to just 城,东,西
 	});
 	minorities.forEach(minority => district = district.replace(minority, ''));
 	media.district = district;
+	if (town.length) {
+		console.assert(['街道', '镇'].some(c => town.endsWith(c)), `town.endsWith(['街道', '镇'])`); // 乡, 社区
+		['街道', '镇'].forEach(c => {
+			if (town.endsWith(c)) town = town.slice(0, -c.length);
+		});
+	}
 	media.town = town;
 	console.log(media.province, media.city, media.district, media.town);
 	const completion = await openai.chat.completions.create({
@@ -99,8 +145,10 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 	});
 	media.description = JSON.parse(completion.choices[0].message.content);
 	const { poem } = media.description;
-	console.assert(poem.length === 4, 'poem.length', poem.length, '!==', 4);
-	poem.forEach(sentence => console.assert(sentence.length === 8, 'sentence.length', sentence.length, '!==', 8));
+	console.assert(poem.length === 4, 'poem.length === 4', poem.length);
+	poem.forEach(sentence => console.assert(sentence.length === 8, 'sentence.length === 8', sentence.length));
 }
+mediaArr = mediaArr.filter(media => media.fileArr.length);
+console.log(`Filtered ${mediaArr.length} medias.`);
 await fs.writeFile('media.json', JSON.stringify(mediaArr, null, '	'));
 await browser.close();
