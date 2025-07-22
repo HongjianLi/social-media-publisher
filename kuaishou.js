@@ -23,7 +23,7 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 //	await page.click('div.rc-virtual-list-holder-inner>div:nth-child(1)');
 	await page.click('div._icon-add_3a3lq_27'); // 添加音乐
 	await new Promise(resolve => setTimeout(resolve, 2000));
-	await page.type('input._search-input_19mmt_16', '先敬罗衣后敬人 许冠杰');
+	await page.type('input._search-input_19mmt_16', '红眼睛 陈慧琳');
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.waitForSelector('span._button_19mmt_162'); // 添加
 	await new Promise(resolve => setTimeout(resolve, 1000));
