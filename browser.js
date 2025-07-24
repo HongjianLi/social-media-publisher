@@ -24,6 +24,7 @@ export default async (url, numFiles = 9, pageHandler) => {
 //		console.assert(response.ok()); // kuaishou would fail this assertion.
 		console.assert(page.url() === url);
 		media.fileArr = media.fileArr.map(file => `${media.dir}/${file}`);
+		media.title = `${media.date}${media.weekday}${media.province}${media.city}${media.district.length ? media.district : media.town}`;
 		media.description = [ ...media.description.poem, ...media.description.sites.map(site => `🤪\n${site}`), '🌏', media.latitude, media.longitude, media.altitude, '🌈', '原创声明：图片是自主拍摄，文字是根据图片拍摄地点由AI生成。' ].join('\n');
 		await pageHandler(page, media);
 		await new Promise(resolve => setTimeout(resolve, 3000));

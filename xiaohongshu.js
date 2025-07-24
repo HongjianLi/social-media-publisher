@@ -12,7 +12,7 @@ browse('https://creator.xiaohongshu.com/publish/publish', 18, async (page, media
 		page.waitForSelector('input.d-text', { timeout: 8000 }),
 		fileChooser.accept(media.fileArr),
 	]);
-	await page.type('input.d-text', `${media.date}${media.weekday}${media.province}${media.city}${media.district}`); // Max 20 characters
+	await page.type('input.d-text', media.title); // Max 20 characters
 	await page.type('div.ql-editor', media.description); // Max 1000 characters.
 	await page.type('div.address-box div.d-select-input-filter>input', `${media.province}${media.city}${media.district}`); // Custom location is supported.
 	await new Promise(resolve => setTimeout(resolve, 3000));

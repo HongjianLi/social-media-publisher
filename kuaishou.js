@@ -11,7 +11,7 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 		page.waitForSelector('div._description_2klkp_59', { timeout: 8000 }),
 		fileChooser.accept(media.fileArr),
 	]);
-	await page.type('div._description_2klkp_59', `${media.date}${media.weekday}${media.province}${media.city}${media.district}\n\n${media.description}`.slice(0, 490)); // Max 500 characters
+	await page.type('div._description_2klkp_59', `${media.title}\n🌲\n${media.description}`.slice(0, 490)); // Max 500 characters
 	await page.click('input#rc_select_1'); // 添加地点。快手不支持自定义地址，只支持当前位置。Custom location is not supported.
 	await new Promise(resolve => setTimeout(resolve, 4000 * media.fileArr.length ));
 	await page.click('input#rc_select_1');

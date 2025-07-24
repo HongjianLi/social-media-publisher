@@ -7,7 +7,7 @@ browse('https://user.qzone.qq.com/896034685/311', 9, async (page, media) => { //
 	const divHandle = await frame.waitForSelector('div[id="QM_Mood_Poster_Container"]');
 	await divHandle.click();
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await divHandle.type(`${media.date}${media.weekday}${media.province}${media.city}${media.district}\n\n${media.description}`); // Max 11000 characters.
+	await divHandle.type(`${media.title}\n🌲\n${media.description}`); // Max 11000 characters.
 	for (let i = 0; i < media.fileArr.length; ++i) {
 		await frame.click('a.pic');
 		await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for the button to load.

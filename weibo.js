@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import browse from './browser.js';
 browse('https://weibo.com/', 18, async (page, media) => { // Max 18 pictures.
-	await page.type('textarea.Form_input_2gtXx', `${media.date}${media.weekday}${media.province}${media.city}${media.district}\n\n${media.description}`); // Max 5000 characters.
+	await page.type('textarea.Form_input_2gtXx', `${media.title}\n🌲\n${media.description}`); // Max 5000 characters.
 	const [fileChooser] = await Promise.all([
 		page.waitForFileChooser(),
 		page.click('div.VPlus_file_n7Xjc'),

@@ -17,7 +17,7 @@ browse('https://mp.toutiao.com/profile_v4/weitoutiao/publish', 18, async (page, 
 	await new Promise(resolve => setTimeout(resolve, 4000 * media.fileArr.length));
 	await page.click('button[data-e2e="imageUploadConfirm-btn"]');
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.type('div.ProseMirror', `${media.date}${media.weekday}${media.province}${media.city}${media.district}\n\n${media.description}`); // Max 2000 characters.
+	await page.type('div.ProseMirror', `${media.title}\n🌲\n${media.description}`); // Max 2000 characters.
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('div.byte-select-view');
 	await new Promise(resolve => setTimeout(resolve, 1000));
