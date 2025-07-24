@@ -34,7 +34,7 @@ const browser = await puppeteer.launch({
 });
 for (const media of mediaArr) { // Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding would exhaust its concurrency limit, and parallel calls to openai.chat.completions.create() would hang.
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
-	console.log(media.dir, media.date, media.weekday);
+	console.log(media.dir, media.date, media.weekday, media.fileArr.length);
 	await Promise.all(media.fileArr.map(async (file) => {
 		const exifTags = await ExifReader.load(`${media.dir}/${file.name}`);
 		const model = exifTags.Model.description;
@@ -75,26 +75,51 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 		continue;
 	}
 	const fileGpsArr = media.fileArr.filter(file => file.gpsOK).map(file => file.name);
-	media.fileArr = media.fileArr.map(file => `${file.name.split('.')[0]}.jpg`); // Change the extension name to .jpg
-	if (!fileGpsArr.length) {
-		console.log('GPS not found');
-		continue;
+	if (fileGpsArr.length) {
+		const file = fileGpsArr[Math.floor(fileGpsArr.length / 2)]; // This is the file where GPS tags will be retrieved from.
+		const exifTags = await ExifReader.load(`${media.dir}/${file}`);
+		const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitudeRef, GPSAltitude } = exifTags;
+		console.assert(GPSLatitudeRef.id === 1 && GPSLatitudeRef.value.length === 1 && GPSLatitudeRef.value[0] === 'N' && GPSLatitudeRef.description === 'North latitude', file, GPSLatitudeRef);
+		console.assert(GPSLatitude.id === 2 && GPSLatitude.value.length === 3 && GPSLatitude.value.every(v => v.length === 2) && GPSLatitude.value[0][1] === 1 && GPSLatitude.value[1][1] === 1 && GPSLatitude.value[2][1] > 0 && GPSLatitude.value[0][0] >= 0 && GPSLatitude.value[0][0] < 90, file, GPSLatitude); // GPSLatitude.value[2][1] could be 1, 100, 3286, 1000000.
+		console.assert(GPSLongitudeRef.id === 3 && GPSLongitudeRef.value.length === 1 && GPSLongitudeRef.value[0] === 'E' && GPSLongitudeRef.description === 'East longitude', file, GPSLongitudeRef);
+		console.assert(GPSLongitude.id === 4 && GPSLongitude.value.length === 3 && GPSLongitude.value.every(v => v.length === 2) && GPSLongitude.value[0][1] === 1 && GPSLongitude.value[1][1] === 1 && GPSLongitude.value[2][1] > 0 && GPSLongitude.value[0][0] >= 0 && GPSLongitude.value[0][0] < 180, file, GPSLongitude); // GPSLongitude.value[2][1] could be 100, 625, 1000000.
+		console.assert(GPSAltitudeRef.id === 5 && ((GPSAltitudeRef.value === 0 && GPSAltitudeRef.description === 'Sea level') || (GPSAltitudeRef.value === 1 && GPSAltitudeRef.description === 'Sea level reference (negative value)')), file, GPSAltitudeRef);
+		console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] > 0 && GPSAltitude.value[0] >= 0 && GPSAltitude.value[0] < 9000000, file, GPSAltitude); // Computed altitude should be < 9000 m. The unit can be 1 or 1000.
+		media.file = file;
+		media.location = `${GPSLatitude.description},${GPSLongitude.description}`;
+		media.latitude = `北纬${GPSLatitude.value[0][0]/GPSLatitude.value[0][1]}°${GPSLatitude.value[1][0]/GPSLatitude.value[1][1]}'${(GPSLatitude.value[2][0]/GPSLatitude.value[2][1]).toFixed(2)}"N`;
+		media.longitude = `东经${GPSLongitude.value[0][0]/GPSLongitude.value[0][1]}°${GPSLongitude.value[1][0]/GPSLongitude.value[1][1]}'${(GPSLongitude.value[2][0]/GPSLongitude.value[2][1]).toFixed(2)}"E`;
+		media.altitude = `海拔${(GPSAltitude.value[0]/GPSAltitude.value[1]).toFixed(0)}米`;
+	} else {
+		const m = [
+			{ dir: '2016-10-28 宁波 舟山', date: '20161029', latitude: 29.940487341248926, longitude: 122.39081741762648 },
+			{ dir: '2016-10-28 宁波 舟山', date: '20161030', latitude: 29.872029593403480, longitude: 121.55048863537063 },
+			{ dir: '2016-11-18 昆明',     date: '20161119', latitude: 25.916746015928774, longitude: 103.07570396383425 },
+			{ dir: '2016-11-18 昆明',     date: '20161120', latitude: 25.922339537228934, longitude: 103.07511557372540 },
+			{ dir: '2019-12-07 珠海',     date: '20191206', latitude: 22.283510556832610, longitude: 113.59658937284914 },
+			{ dir: '2019-12-07 珠海',     date: '20191207', latitude: 22.290209398539717, longitude: 113.59539848923495 },
+			{ dir: '2020-05-13 深圳',     date: '20200513', latitude: 22.550778996792184, longitude: 114.57827398298905 },
+			{ dir: '2020-05-13 深圳',     date: '20200514', latitude: 22.613232773623105, longitude: 114.42310760619914 },
+		].find(m => media.dir.endsWith(m.dir) && m.date === media.date);
+		if (m) {
+			media.location = `${m.latitude},${m.longitude}`;
+			function convertll(a) {
+				const v = a.pop();
+				const f = Math.floor(v);
+				a.push(f, (v - f) * 60);
+			}
+			const latitudeArr = [m.latitude]; convertll(latitudeArr); convertll(latitudeArr);
+			const longitudeArr = [m.longitude]; convertll(longitudeArr); convertll(longitudeArr);
+			media.latitude = `北纬${latitudeArr[0]}°${latitudeArr[1]}'${latitudeArr[2].toFixed(2)}"N`;
+			media.longitude = `东经${longitudeArr[0]}°${longitudeArr[1]}'${longitudeArr[2].toFixed(2)}"E`;
+			media.altitude = `海拔0米`; // Google Elevation API can return elevation data for a location. https://developers.google.com/maps/documentation/elevation/overview
+		} else {
+			console.log('GPS not found');
+			continue;
+		}
 	}
-	const file = fileGpsArr[Math.floor(fileGpsArr.length / 2)]; // This is the file where GPS tags will be retrieved from.
-	const exifTags = await ExifReader.load(`${media.dir}/${file}`);
-	const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitudeRef, GPSAltitude } = exifTags;
-	console.assert(GPSLatitudeRef.id === 1 && GPSLatitudeRef.value.length === 1 && GPSLatitudeRef.value[0] === 'N' && GPSLatitudeRef.description === 'North latitude', file, GPSLatitudeRef);
-	console.assert(GPSLatitude.id === 2 && GPSLatitude.value.length === 3 && GPSLatitude.value.every(v => v.length === 2) && GPSLatitude.value[0][1] === 1 && GPSLatitude.value[1][1] === 1 && GPSLatitude.value[2][1] > 0 && GPSLatitude.value[0][0] >= 0 && GPSLatitude.value[0][0] < 90, file, GPSLatitude); // GPSLatitude.value[2][1] could be 1, 100, 3286, 1000000.
-	console.assert(GPSLongitudeRef.id === 3 && GPSLongitudeRef.value.length === 1 && GPSLongitudeRef.value[0] === 'E' && GPSLongitudeRef.description === 'East longitude', file, GPSLongitudeRef);
-	console.assert(GPSLongitude.id === 4 && GPSLongitude.value.length === 3 && GPSLongitude.value.every(v => v.length === 2) && GPSLongitude.value[0][1] === 1 && GPSLongitude.value[1][1] === 1 && GPSLongitude.value[2][1] > 0 && GPSLongitude.value[0][0] >= 0 && GPSLongitude.value[0][0] < 180, file, GPSLongitude); // GPSLongitude.value[2][1] could be 100, 625, 1000000.
-	console.assert(GPSAltitudeRef.id === 5 && ((GPSAltitudeRef.value === 0 && GPSAltitudeRef.description === 'Sea level') || (GPSAltitudeRef.value === 1 && GPSAltitudeRef.description === 'Sea level reference (negative value)')), file, GPSAltitudeRef);
-	console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] > 0 && GPSAltitude.value[0] >= 0 && GPSAltitude.value[0] < 9000000, file, GPSAltitude); // Computed altitude should be < 9000 m. The unit can be 1 or 1000.
-	media.file = file;
-	media.latitude = `北纬${GPSLatitude.value[0][0]/GPSLatitude.value[0][1]}°${GPSLatitude.value[1][0]/GPSLatitude.value[1][1]}'${(GPSLatitude.value[2][0]/GPSLatitude.value[2][1]).toFixed(2)}"N`;
-	media.longitude = `东经${GPSLongitude.value[0][0]/GPSLongitude.value[0][1]}°${GPSLongitude.value[1][0]/GPSLongitude.value[1][1]}'${(GPSLongitude.value[2][0]/GPSLongitude.value[2][1]).toFixed(2)}"E`;
-	media.altitude = `海拔${(GPSAltitude.value[0]/GPSAltitude.value[1]).toFixed(0)}米`;
 	const page = await browser.newPage();
-	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&location=${GPSLatitude.description},${GPSLongitude.description}`); // API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base  Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
+	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&location=${media.location}`); // API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base  Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
 	const revGeo = await revGeoRes.json();
 	await page.close();
 	if (revGeo.status !== 0) {
@@ -147,6 +172,7 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 	const { poem } = media.description;
 	console.assert(poem.length === 4, 'poem.length === 4', poem.length);
 	poem.forEach(sentence => console.assert(sentence.length === 8, 'sentence.length === 8', sentence.length));
+	media.fileArr = media.fileArr.map(file => `${file.name.substring(0, file.name.lastIndexOf('.'))}.jpg`); // Change the extension name to .jpg, as douyin, toutiao, kuaishou, xiaohongshu, qzone do not support uploading .HEIC files. They will be converted via "magick mogrify -format jpg *.HEIC"
 }
 mediaArr = mediaArr.filter(media => media.fileArr.length);
 console.log(`Filtered ${mediaArr.length} medias.`);
