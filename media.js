@@ -91,7 +91,7 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 		media.longitude = `东经${GPSLongitude.value[0][0]/GPSLongitude.value[0][1]}°${GPSLongitude.value[1][0]/GPSLongitude.value[1][1]}'${(GPSLongitude.value[2][0]/GPSLongitude.value[2][1]).toFixed(2)}"E`;
 		media.altitude = `海拔${(GPSAltitude.value[0]/GPSAltitude.value[1]).toFixed(0)}米`;
 	} else {
-		const m = [
+		const m = [ // Baidu map's geocoding service can return latitude and longitude given a domestic address, like this: https://api.map.baidu.com/geocoding/v3/?ak=ak&output=json&address=宁波市天一广场  https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-base, but it will return wrong result for overseas addresses such as 日本大阪. In that case, manual searching Google is suggested.
 			{ dir: '2016-10-28 宁波 舟山', date: '20161029', latitude: 29.940487341248926, longitude: 122.39081741762648 },
 			{ dir: '2016-10-28 宁波 舟山', date: '20161030', latitude: 29.872029593403480, longitude: 121.55048863537063 },
 			{ dir: '2016-11-18 昆明',     date: '20161119', latitude: 25.916746015928774, longitude: 103.07570396383425 },
@@ -100,6 +100,7 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 			{ dir: '2019-12-07 珠海',     date: '20191207', latitude: 22.290209398539717, longitude: 113.59539848923495 },
 			{ dir: '2020-05-13 深圳',     date: '20200513', latitude: 22.550778996792184, longitude: 114.57827398298905 },
 			{ dir: '2020-05-13 深圳',     date: '20200514', latitude: 22.613232773623105, longitude: 114.42310760619914 },
+			{ dir: '2016-11-03 Osaka',   date: '20161103', latitude: 34.646833, longitude: 135.499083 },
 		].find(m => media.dir.endsWith(m.dir) && m.date === media.date);
 		if (m) {
 			media.location = `${m.latitude},${m.longitude}`;
