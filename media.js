@@ -100,7 +100,11 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 			{ dir: '2019-12-07 珠海',     date: '20191207', latitude: 22.290209398539717, longitude: 113.59539848923495 }, // 广东珠海香洲香湾
 			{ dir: '2020-05-13 深圳',     date: '20200513', latitude: 22.550778996792184, longitude: 114.57827398298905 }, // 广东深圳龙岗南澳
 			{ dir: '2020-05-13 深圳',     date: '20200514', latitude: 22.613232773623105, longitude: 114.42310760619914 }, // 广东深圳龙岗葵涌
-			{ dir: '2016-11-03 Osaka',   date: '20161103', latitude: 34.646833, longitude: 135.499083 }, // 日本大阪
+			{ dir: '2016-11-03 Osaka',   date: '20161103', latitude: 34.646833, longitude: 135.499083 }, // 日本大阪 For overseas locations, baidu map's reverse geocoding can resolve to the granularity of city only, with district and town usually being empty.
+			{ dir: '2016-11-03 Osaka',   date: '20161104', latitude: 34.646833, longitude: 135.499083 }, // 日本大阪
+			{ dir: '2016-11-03 Osaka',   date: '20161105', latitude: 35.011641, longitude: 135.768190 }, // 日本京都
+			{ dir: '2016-11-03 Osaka',   date: '20161106', latitude: 35.011641, longitude: 135.768190 }, // 日本京都
+			{ dir: '2016-11-03 Osaka',   date: '20161107', latitude: 34.69017, longitude: 135.19544 }, // 日本神户
 		].find(m => media.dir.endsWith(m.dir) && m.date === media.date);
 		if (m) {
 			media.location = `${m.latitude},${m.longitude}`;
