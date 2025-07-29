@@ -12,13 +12,11 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.type('div._description_2klkp_59', `${media.title}\n🌲\n${media.description}`.slice(0, 490)); // Max 500 characters
-	await page.click('input#rc_select_1'); // 添加地点。快手不支持自定义地址，只支持当前位置。Custom location is not supported.
+	await page.click('input#rc_select_1'); // 添加地点
 	await new Promise(resolve => setTimeout(resolve, 4000 * media.fileArr.length ));
-	await page.click('input#rc_select_1');
-	await new Promise(resolve => setTimeout(resolve, 2000));
-	await page.click('ul.ant-cascader-menu>li:nth-child(1)');
+	await page.click('ul.ant-cascader-menu>li:nth-child(1)'); // Select the first city.
 	await new Promise(resolve => setTimeout(resolve, 1000));
-//	await page.click('input#rc_select_2'); // 详细地址
+//	await page.click('input#rc_select_2'); // 详细地址  No addresses will be shown.
 //	await new Promise(resolve => setTimeout(resolve, 3000));
 //	await page.click('div.rc-virtual-list-holder-inner>div:nth-child(1)');
 	await page.click('div._icon-add_3a3lq_27'); // 添加音乐
