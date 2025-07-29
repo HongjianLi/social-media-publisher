@@ -81,15 +81,17 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 		const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitudeRef, GPSAltitude } = exifTags;
 		console.assert(GPSLatitudeRef.id === 1 && GPSLatitudeRef.value.length === 1 && GPSLatitudeRef.value[0] === 'N' && GPSLatitudeRef.description === 'North latitude', file, GPSLatitudeRef);
 		console.assert(GPSLatitude.id === 2 && GPSLatitude.value.length === 3 && GPSLatitude.value.every(v => v.length === 2) && GPSLatitude.value[0][1] === 1 && GPSLatitude.value[1][1] === 1 && GPSLatitude.value[2][1] > 0 && GPSLatitude.value[0][0] >= 0 && GPSLatitude.value[0][0] < 90, file, GPSLatitude); // GPSLatitude.value[2][1] could be 1, 100, 3286, 1000000.
+		console.assert(GPSLatitude.description === GPSLatitude.value[0][0]/GPSLatitude.value[0][1] + (GPSLatitude.value[1][0]/GPSLatitude.value[1][1]) / 60 + (GPSLatitude.value[2][0]/GPSLatitude.value[2][1]) / 3600);
 		console.assert(GPSLongitudeRef.id === 3 && GPSLongitudeRef.value.length === 1 && GPSLongitudeRef.value[0] === 'E' && GPSLongitudeRef.description === 'East longitude', file, GPSLongitudeRef);
 		console.assert(GPSLongitude.id === 4 && GPSLongitude.value.length === 3 && GPSLongitude.value.every(v => v.length === 2) && GPSLongitude.value[0][1] === 1 && GPSLongitude.value[1][1] === 1 && GPSLongitude.value[2][1] > 0 && GPSLongitude.value[0][0] >= 0 && GPSLongitude.value[0][0] < 180, file, GPSLongitude); // GPSLongitude.value[2][1] could be 100, 625, 1000000.
+		console.assert(GPSLongitude.description === GPSLongitude.value[0][0]/GPSLongitude.value[0][1] + (GPSLongitude.value[1][0]/GPSLongitude.value[1][1]) / 60 + (GPSLongitude.value[2][0]/GPSLongitude.value[2][1]) / 3600);
 		console.assert(GPSAltitudeRef.id === 5 && ((GPSAltitudeRef.value === 0 && GPSAltitudeRef.description === 'Sea level') || (GPSAltitudeRef.value === 1 && GPSAltitudeRef.description === 'Sea level reference (negative value)')), file, GPSAltitudeRef);
-		console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] > 0 && GPSAltitude.value[0] >= 0 && GPSAltitude.value[0] < 9000000, file, GPSAltitude); // Computed altitude should be < 9000 m. The unit can be 1 or 1000.
+		console.assert(GPSAltitude.id === 6 && GPSAltitude.value.length === 2 && GPSAltitude.value[1] > 0 && GPSAltitude.value[0] >= 0 && (GPSAltitude.value[0] < 99999000 || GPSAltitude.value[0] > 4200000000), file, GPSAltitude); // Computed altitude should be < 99999 m. The unit can be 1 or 1000.
 		media.file = file;
-		media.location = `${GPSLatitude.description},${GPSLongitude.description}`;
-		media.latitude = `北纬${GPSLatitude.value[0][0]/GPSLatitude.value[0][1]}°${GPSLatitude.value[1][0]/GPSLatitude.value[1][1]}'${(GPSLatitude.value[2][0]/GPSLatitude.value[2][1]).toFixed(2)}"N`;
-		media.longitude = `东经${GPSLongitude.value[0][0]/GPSLongitude.value[0][1]}°${GPSLongitude.value[1][0]/GPSLongitude.value[1][1]}'${(GPSLongitude.value[2][0]/GPSLongitude.value[2][1]).toFixed(2)}"E`;
-		media.altitude = `海拔${(GPSAltitude.value[0]/GPSAltitude.value[1]).toFixed(0)}米`;
+		media.latitude = GPSLatitude.description;
+		media.longitude = GPSLongitude.description;
+		media.altitude = GPSAltitude.value[0]/GPSAltitude.value[1];
+		if (media.altitude > 4200000000) media.altitude -= 4294967296;
 	} else {
 		const m = [ // Baidu map's geocoding service can return latitude and longitude given a domestic address, like this: https://api.map.baidu.com/geocoding/v3/?ak=ak&output=json&address=宁波市天一广场  https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-base, but it will return wrong result for overseas addresses such as 日本大阪. In that case, manual searching Google is suggested.
 			{ dir: '2016-10-28 宁波 舟山', date: '20161029', latitude: 29.940487341248926, longitude: 122.39081741762648 }, // 浙江舟山普陀朱家尖
@@ -107,24 +109,16 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 			{ dir: '2016-11-03 Osaka',   date: '20161107', latitude: 34.69017, longitude: 135.19544 }, // 日本神户
 		].find(m => media.dir.endsWith(m.dir) && m.date === media.date);
 		if (m) {
-			media.location = `${m.latitude},${m.longitude}`;
-			function convertll(a) {
-				const v = a.pop();
-				const f = Math.floor(v);
-				a.push(f, (v - f) * 60);
-			}
-			const latitudeArr = [m.latitude]; convertll(latitudeArr); convertll(latitudeArr);
-			const longitudeArr = [m.longitude]; convertll(longitudeArr); convertll(longitudeArr);
-			media.latitude = `北纬${latitudeArr[0]}°${latitudeArr[1]}'${latitudeArr[2].toFixed(2)}"N`;
-			media.longitude = `东经${longitudeArr[0]}°${longitudeArr[1]}'${longitudeArr[2].toFixed(2)}"E`;
-			media.altitude = `海拔0米`; // Google Elevation API can return elevation data for a location. https://developers.google.com/maps/documentation/elevation/overview
+			media.latitude = m.latitude;
+			media.longitude = m.longitude;
+			media.altitude = 0; // Google Elevation API can return elevation data for a location. https://developers.google.com/maps/documentation/elevation/overview
 		} else {
 			console.log('GPS not found');
 			continue;
 		}
 	}
 	const page = await browser.newPage();
-	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&location=${media.location}`); // API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base  Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
+	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&location=${media.latitude},${media.longitude}`); // API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base  Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
 	const revGeo = await revGeoRes.json();
 	await page.close();
 	if (revGeo.status !== 0) {

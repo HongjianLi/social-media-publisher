@@ -8,8 +8,8 @@ mediaArr.forEach(media => {
 	media.title = `${media.date}${media.weekday}${media.province}${media.city}${media.district.length ? media.district : media.town}`;
 	console.assert(media.title.length <= 18, media.title); // Max 20 characters for douyin, xiaohongshu.
 	console.assert(media.fileArr.length);
-	console.assert(media.latitude.length);
-	console.assert(media.altitude.length <= 7);
+	console.assert(media.latitude !== undefined);
+	console.assert(media.altitude <= 99999);
 	console.assert(media.district.length <= 5);
 	console.assert(media.town.length <= 5);
 	console.assert(!media.town.endsWith('镇') || media.town === '古镇', media.town);

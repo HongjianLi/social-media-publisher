@@ -26,10 +26,17 @@ export default async (url, numFiles = 9, pageHandler) => {
 		console.assert(page.url() === url);
 		media.fileArr = media.fileArr.map(file => `${media.dir}/${file}`);
 		media.title = `${media.date}${media.weekday}${media.province}${media.city}${media.district.length ? media.district : media.town}`;
-		media.description = [ ...media.description.poem, ...media.description.sites.map(site => `🤪\n${site}`), '🌏', media.latitude, media.longitude, media.altitude, '🌈', '原创声明：图片是自主拍摄，文字是根据图片拍摄地点由AI生成。' ].join('\n');
+		const latitudeArr = [media.latitude]; convertll(latitudeArr); convertll(latitudeArr);
+		const longitudeArr = [media.longitude]; convertll(longitudeArr); convertll(longitudeArr);
+		media.description = [ ...media.description.poem, ...media.description.sites.map(site => `🤪\n${site}`), '🌏', `北纬${latitudeArr[0]}°${latitudeArr[1]}'${latitudeArr[2].toFixed(2)}"N`, `东经${longitudeArr[0]}°${longitudeArr[1]}'${longitudeArr[2].toFixed(2)}"E`, `海拔${media.altitude.toFixed(0)}米`, '🌈', '原创声明：图片是自主拍摄，文字是根据图片拍摄地点由AI生成。' ].join('\n');
 		await pageHandler(page, media);
 		await new Promise(resolve => setTimeout(resolve, 3000));
 		await page.close();
 	}
 	await browser.close();
 };
+function convertll(a) {
+	const v = a.pop();
+	const f = Math.floor(v);
+	a.push(f, (v - f) * 60);
+}
