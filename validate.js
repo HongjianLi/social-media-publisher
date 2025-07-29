@@ -18,5 +18,11 @@ mediaArr.forEach(media => {
 	console.assert(poem.length === 4, 'poem.length === 4', poem.length);
 	poem.forEach(sentence => console.assert(sentence.length === 8, 'sentence.length === 8', sentence.length, sentence));
 	if (media.fileArr.length >= 9) ++countArr[0]; else ++countArr[media.fileArr.length];
+/*	if (media.fileArr.length === 1) { // Create symlinks to inspect those dates with only one picture.
+		media.fileArr.forEach(async file => {
+			try { await fs.access(`${media.dir}/${file}`); } catch { file = `${file.substring(0, file.lastIndexOf('.'))}.HEIC`; }
+			await fs.symlink(`${media.dir}/${file}`, file);
+		});
+	}*/
 });
 console.log(countArr);
