@@ -7,6 +7,7 @@ export default async (url, numFiles = 9, pageHandler) => {
 		defaultViewport: { width: 1440, height: 1400 },
 		args: ['--start-fullscreen'],
 	});
+	await browser.defaultBrowserContext().overridePermissions(url.split('/').slice(0, 3).join('/'), ['geolocation']); // https://pptr.dev/api/puppeteer.browsercontext.overridepermissions
 	await fs.readFile('cookies.json').then(JSON.parse).then(cookies => browser.setCookie(...cookies));
 	const mediaArr = await fs.readFile('media.json').then(JSON.parse);
 	for (const media of mediaArr) {
@@ -21,6 +22,7 @@ export default async (url, numFiles = 9, pageHandler) => {
 		}
 		const page = await browser.newPage();
 		await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0');
+		await page.setGeolocation({ latitude: media.latitude, longitude: media.longitude }); // https://pptr.dev/api/puppeteer.page.setgeolocation
 		const response = await page.goto(url, { waitUntil: 'networkidle2' });
 //		console.assert(response.ok()); // kuaishou would fail this assertion.
 		console.assert(page.url() === url);
