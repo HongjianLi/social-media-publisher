@@ -31,7 +31,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 		await page.click(`div.semi-cascader-option-lists>ul:nth-child(3)>li:nth-child(${1 + citynth})`); // nth-child is 1-based.
 	}
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.type('section.radioExtra-BUxspN>div.semi-datepicker>div>div>input', `${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`); // 设置拍摄日期
+	await page.type('section.radioExtra-BUxspN>div.semi-datepicker>div>div>input', `${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`); // 设置拍摄日期 This date has to be newer than 2020-01-01, otherwise it will not be saved.
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('button.semi-button-primary.btn-I78nOi'); // 确定
 	await new Promise(resolve => setTimeout(resolve, 1000));
