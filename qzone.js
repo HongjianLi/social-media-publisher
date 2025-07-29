@@ -8,9 +8,10 @@ browse('https://user.qzone.qq.com/896034685/311', 9, async (page, media) => { //
 	await divHandle.click();
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await divHandle.type(`${media.title}\n🌲\n${media.description}`); // Max 11000 characters.
+	await new Promise(resolve => setTimeout(resolve, 500));
 	for (let i = 0; i < media.fileArr.length; ++i) {
 		await frame.click('a.pic');
-		await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for the button to load.
+		await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for the button to load.
 		const [fileChooser] = await Promise.all([
 			page.waitForFileChooser(),
 			frame.click('li.qz_poster_btn_local_pic'),
