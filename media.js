@@ -40,15 +40,17 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 		const model = exifTags.Model.description;
 		console.assert(['iQOO Neo8 Pro', 'Redmi K30 Pro', 'Redmi Note 5', 'Redmi Pro', 'Redmi Note 2'].includes(model), 'Unknown model:', model);
 		const orientation = exifTags['Orientation'];
-		console.assert(orientation.id === 274);
-		console.assert([0, 1, 3, 6, 8].includes(orientation.value), file.name, model, orientation);
-		if (!(
-			(model === 'iQOO Neo8 Pro' && ((orientation.value === 0 && orientation.description === 'Undefined'))) || // Other values are { id: 274, value: 1, description: 'top-left' }, { id: 274, value: 6, description: 'right-top' }
-			(model === 'Redmi K30 Pro' && ((orientation.value === 6 && orientation.description === 'right-top'))) || // Other values are { id: 274, value: 1, description: 'top-left' }, { id: 274, value: 3, description: 'bottom-right' }, { id: 274, value: 8, description: 'left-bottom' }
-			(model === 'Redmi Note 5'  && ((orientation.value === 6 && orientation.description === 'right-top'))) ||
-			(model === 'Redmi Pro'     && ((orientation.value === 0 && orientation.description === 'Undefined') || (orientation.value === 1 && orientation.description === 'top-left'))) ||
-			(model === 'Redmi Note 2'  && ((orientation.value === 1 && orientation.description === 'top-left')))
-		)) return; // Keep portrait orientation only. Discard landscape orientation and panorama.
+		if (orientation) {
+			console.assert(orientation.id === 274);
+			console.assert([0, 1, 3, 6, 8].includes(orientation.value), file.name, model, orientation);
+			if (!(
+				(model === 'iQOO Neo8 Pro' && ((orientation.value === 0 && orientation.description === 'Undefined'))) || // Other values are { id: 274, value: 1, description: 'top-left' }, { id: 274, value: 6, description: 'right-top' }
+				(model === 'Redmi K30 Pro' && ((orientation.value === 6 && orientation.description === 'right-top'))) || // Other values are { id: 274, value: 1, description: 'top-left' }, { id: 274, value: 3, description: 'bottom-right' }, { id: 274, value: 8, description: 'left-bottom' }
+				(model === 'Redmi Note 5'  && ((orientation.value === 6 && orientation.description === 'right-top'))) ||
+				(model === 'Redmi Pro'     && ((orientation.value === 0 && orientation.description === 'Undefined') || (orientation.value === 1 && orientation.description === 'top-left'))) ||
+				(model === 'Redmi Note 2'  && ((orientation.value === 1 && orientation.description === 'top-left')))
+			)) return; // Keep portrait orientation only. Discard landscape orientation and panorama.
+		}
 		// Images taken by iQOO Neo8 Pro have ImageWidth and 'Image Width'. Images taken by Redmi K30 Pro all have ImageWidth, but only some have 'Image Width'. Images taken by Redmi Note 5, Redmi Pro, Redmi Note 2 have 'Image Width' but not ImageWidth.
 		const width = exifTags['ImageWidth'] ? exifTags['ImageWidth'].value : exifTags['Image Width'].value;
 		const height = exifTags['ImageLength'] ? exifTags['ImageLength'].value : exifTags['Image Height'].value;
