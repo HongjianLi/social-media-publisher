@@ -118,14 +118,15 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 		}
 	}
 	const page = await browser.newPage();
-	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&location=${media.latitude},${media.longitude}`); // API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base  Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
+	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&language=zh-CN&location=${media.latitude},${media.longitude}`); // API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base  Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
 	const revGeo = await revGeoRes.json();
 	await page.close();
 	if (revGeo.status !== 0) {
 		console.error(`revGeo.status`, revGeo.status); // 1: 服务器内部错误; 302: 天配额超限，限制访问; 401: 当前并发量已经超过约定并发配额，限制访问;
 		break;
 	}
-	let { province, city, district, town } = revGeo.result.addressComponent;
+	let { country, province, city, district, town } = revGeo.result.addressComponent;
+	media.country = country;
 	if (['香港', '澳门', '重庆市', '上海市', '天津市', '北京市'].includes(province)) {
 		media.province = '';
 	} else {
@@ -153,14 +154,14 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 		});
 	}
 	media.town = town;
-	console.log(media.province, media.city, media.district, media.town);
+	console.log(media.country, media.province, media.city, media.district, media.town);
 	const completion = await openai.chat.completions.create({
 		model: "qwen-turbo", // https://help.aliyun.com/zh/model-studio/what-is-qwen-llm
 		messages: [{
 			"role": "user",
 			"content": [{
 				"type": "text",
-				"text": `介绍${media.province}${media.city}${media.district}${media.town}的四个旅游景点。输出JSON。字段poem是字符串数组，包含四句七律诗描绘这些景点，每句包含七个字和一个标点符号。字段sites是字符串数组，包含四句，每句开头是景点的名字，然后用自然语言详细介绍景点、地址、游玩月份。`,
+				"text": `介绍${media.country}${media.province}${media.city}${media.district}${media.town}的四个旅游景点。输出JSON。字段poem是字符串数组，包含四句七律诗描绘这些景点，每句包含七个字和一个标点符号。字段sites是字符串数组，包含四句，每句开头是景点的名字，然后用自然语言详细介绍景点、地址、游玩月份。`,
 			}],
 		}],
 		response_format: {
