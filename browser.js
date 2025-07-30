@@ -30,7 +30,11 @@ export default async (url, numFiles = 9, pageHandler) => {
 		media.title = `${media.date}${media.weekday}${media.province}${media.city}${media.district.length ? media.district : media.town}`;
 		const latitudeArr = [media.latitude]; convertll(latitudeArr); convertll(latitudeArr);
 		const longitudeArr = [media.longitude]; convertll(longitudeArr); convertll(longitudeArr);
-		media.description = [ ...media.description.poem, ...media.description.sites.map(site => `🤪\n${site}`), '🌏', `北纬${latitudeArr[0]}°${latitudeArr[1]}'${latitudeArr[2].toFixed(2)}"N`, `东经${longitudeArr[0]}°${longitudeArr[1]}'${longitudeArr[2].toFixed(2)}"E`, `海拔${media.altitude.toFixed(0)}米`, '🌈', '原创声明：图片是自主拍摄，文字是根据图片拍摄地点由AI生成。' ].join('\n');
+		for (var siteIndex = 0, siteLength = 0; siteIndex < media.description.sites.length && siteLength + media.description.sites[siteIndex].length <= 350; siteLength += media.description.sites[siteIndex++].length);
+		console.assert(siteIndex >= 2, 'siteIndex >= 2', siteIndex);
+		media.description = [ ...media.description.poem, ...media.description.sites.slice(0, siteIndex).map(site => `🤪\n${site}`), '🌏', `北纬${latitudeArr[0]}°${latitudeArr[1]}'${latitudeArr[2].toFixed(2)}"N`, `东经${longitudeArr[0]}°${longitudeArr[1]}'${longitudeArr[2].toFixed(2)}"E`, `海拔${media.altitude.toFixed(0)}米`, '🌈', '原创声明：图片是自主拍摄，文字是根据图片拍摄地点由AI生成。' ].join('\n');
+		const description = [ media.title, '🌲', media.description ].join('\n');
+		console.assert(description.length <= 500, 'description.length <= 500', description.length);
 		await pageHandler(page, media);
 		await new Promise(resolve => setTimeout(resolve, 3000));
 		await page.close();
