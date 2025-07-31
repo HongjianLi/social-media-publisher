@@ -27,7 +27,9 @@ export default async (url, numFiles = 9, pageHandler) => {
 //		console.assert(response.ok()); // kuaishou would fail this assertion.
 		console.assert(page.url() === url);
 		media.fileArr = media.fileArr.map(file => `${media.dir}/${file}`);
-		media.title = `${media.date}${media.weekday}${media.province}${media.city}${media.district.length ? media.district : media.town}`;
+		media.address = `${media.country === '中国' ? media.province : media.country}${media.city}${media.district.length ? media.district : media.town}`; // The granularity of address is at the district level, not the town level, because toutiao and weibo often lack selectable addresses for a specific town.
+		media.title = `${media.date}${media.weekday}${media.address}`;
+		console.assert(media.title.length <= 20, 'media.title.length <= 20', media.title.length); // Max 20 characters for douyin, xiaohongshu.
 		const latitudeArr = [media.latitude]; convertll(latitudeArr); convertll(latitudeArr);
 		const longitudeArr = [media.longitude]; convertll(longitudeArr); convertll(longitudeArr);
 		for (var siteIndex = 0, siteLength = 0; siteIndex < media.description.sites.length && siteLength + media.description.sites[siteIndex].length <= 350; siteLength += media.description.sites[siteIndex++].length);

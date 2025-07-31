@@ -15,7 +15,7 @@ browse('https://weibo.com/', 18, async (page, media) => { // Max 18 pictures.
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('div.Tool_iconitem_2d5Oo>div.woo-pop-wrap>div.woo-pop-main>div.woo-pop-wrap-main>div:nth-child(3)'); // 地点
 	await new Promise(resolve => setTimeout(resolve, 2000));
-	await page.type('div.Place_ipt_y5__F>input', `${media.province}${media.city}${media.district}`); // Custom location is supported.
+	await page.type('div.Place_ipt_y5__F>input', media.address);
 	await new Promise(resolve => setTimeout(resolve, 3000));
 	await page.click('div.vue-recycle-scroller__item-wrapper>div'); // 第一个地点
 	await new Promise(resolve => setTimeout(resolve, 1000));

@@ -39,9 +39,9 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	}
 	await page.click('div.select-Ht3mEC'); // 输入相关位置
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.type('div.select-Ht3mEC', `${media.province}${media.city}${media.district}`); // 输入相关位置
-	await new Promise(resolve => setTimeout(resolve, 7000)); // 等待加载位置
-	const cityIndex = (await page.$eval('div#scrollContainer', el => el.innerText)).split('\n').indexOf(media.city); // Custom location is not supported.
+	await page.type('div.select-Ht3mEC', media.address); // 输入相关位置
+	await new Promise(resolve => setTimeout(resolve, 5000)); // 等待加载位置
+	const cityIndex = (await page.$eval('div#scrollContainer', el => el.innerText)).split('\n').indexOf(media.city);
 	await page.click(`div#scrollContainer>div:nth-child(${cityIndex >= 0 ? 1 + cityIndex : 1})`); // 选择城市。 nth-child is 1-based. Default to the first city if not found.
 	await new Promise(resolve => setTimeout(resolve, 3000));
 	await page.click('div.option-v2-eZrjiM'); // 选择该城市下的第一个位置

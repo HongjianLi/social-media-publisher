@@ -23,9 +23,9 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.type('input._search-input_19mmt_16', '红眼睛 陈慧琳');
 	await new Promise(resolve => setTimeout(resolve, 2000));
-	await page.waitForSelector('span._button_19mmt_162'); // 添加
+	await page.waitForSelector('span._button_19mmt_162'); // 等待添加按钮
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.click('span._button_19mmt_162');
+	await page.click('span._button_19mmt_162'); // 添加
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2' }),

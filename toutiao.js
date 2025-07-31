@@ -19,11 +19,11 @@ browse('https://mp.toutiao.com/profile_v4/weitoutiao/publish', 18, async (page, 
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.type('div.ProseMirror', `${media.title}\n🌲\n${media.description}`); // Max 2000 characters.
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.click('div.byte-select-view');
-	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.type('span.byte-select-view-search>input', `${media.province}${media.city}${media.district}`); // Custom location is supported.
+	await page.click('div.byte-select-view'); // 标记位置，让更多用户看到
+	await new Promise(resolve => setTimeout(resolve, 2000));
+	await page.type('span.byte-select-view-search>input', media.address); // 标记位置，让更多用户看到
 	await new Promise(resolve => setTimeout(resolve, 4000));
-	await page.click('ul.byte-select-popup-inner>li:nth-child(1)');
+	try { await page.click('ul.byte-select-popup-inner>li'); } catch {} // 选择第一个位置  可能会出现“暂无数据”
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
