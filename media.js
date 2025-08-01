@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import fs from 'fs/promises';
 import ExifReader from 'exifreader';
-import puppeteer from 'puppeteer-core';
 const dirArr = (await fs.readdir('Pictures', { withFileTypes: true })).filter(file => file.isDirectory()).map(file => `${file.parentPath}/${file.name}`);
 console.log(`Found ${dirArr.length} directories.`);
 console.assert(dirArr.length);
@@ -24,9 +23,6 @@ for (const dir of dirArr) {
 console.log(`Expanded to ${mediaArr.length} medias.`);
 console.assert(mediaArr.length);
 const minorities = ["蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族","哈尼族","哈萨克族","傣族","黎族","傈僳族","佤族","畲族","高山族","拉祜族","水族","东乡族","纳西族","景颇族","柯尔克孜族","土族","达斡尔族","仫佬族","羌族","布朗族","撒拉族","毛南族","仡佬族","锡伯族","阿昌族","普米族","塔吉克族","怒族","乌孜别克族","俄罗斯族","鄂温克族","德昂族","保安族","裕固族","京族","塔塔尔族","独龙族","鄂伦春族","赫哲族","门巴族","珞巴族","基诺族","各族"];
-const browser = await puppeteer.launch({
-	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-});
 for (const media of mediaArr) { // Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding would exhaust its concurrency limit, and parallel POSTs to dashscope.aliyuncs.com would hang.
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	console.log(media.dir, media.date, media.weekday, media.fileArr.length);
@@ -114,10 +110,12 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 			continue;
 		}
 	}
-	const page = await browser.newPage();
-	const revGeoRes = await page.goto(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&language=zh-CN&location=${media.latitude},${media.longitude}`); // API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base  Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
-	const revGeo = await revGeoRes.json();
-	await page.close();
+	// API: https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-geocoding-abroad-base
+	// Alternatives: https://lbs.amap.com/api/webservice/guide/api/georegeo, https://lbs.qq.com/service/webService/webServiceGuide/address/Gcoder, http://lbs.tianditu.gov.cn/server/geocoding.html
+	const revGeo = await fetch(`https://api.map.baidu.com/reverse_geocoding/v3?ak=${process.env.BAIDUMAP_API_KEY}&output=json&coordtype=wgs84ll&language=zh-CN&location=${media.latitude},${media.longitude}`).then(response => {
+		console.assert(response.ok, 'response.status', response.status, 'response.statusText', response.statusText);
+		return response.json();
+	});
 	if (revGeo.status !== 0) {
 		console.error(`revGeo.status`, revGeo.status); // 1: 服务器内部错误; 302: 天配额超限，限制访问; 401: 当前并发量已经超过约定并发配额，限制访问;
 		break;
@@ -181,4 +179,3 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 mediaArr = mediaArr.filter(media => media.fileArr.length);
 console.log(`Filtered ${mediaArr.length} medias.`);
 await fs.writeFile('media.json', JSON.stringify(mediaArr, null, '	'));
-await browser.close();
