@@ -2,7 +2,6 @@
 import fs from 'fs/promises';
 import ExifReader from 'exifreader';
 import puppeteer from 'puppeteer-core';
-import OpenAI from 'openai';
 const dirArr = (await fs.readdir('Pictures', { withFileTypes: true })).filter(file => file.isDirectory()).map(file => `${file.parentPath}/${file.name}`);
 console.log(`Found ${dirArr.length} directories.`);
 console.assert(dirArr.length);
@@ -25,14 +24,10 @@ for (const dir of dirArr) {
 console.log(`Expanded to ${mediaArr.length} medias.`);
 console.assert(mediaArr.length);
 const minorities = ["蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族","哈尼族","哈萨克族","傣族","黎族","傈僳族","佤族","畲族","高山族","拉祜族","水族","东乡族","纳西族","景颇族","柯尔克孜族","土族","达斡尔族","仫佬族","羌族","布朗族","撒拉族","毛南族","仡佬族","锡伯族","阿昌族","普米族","塔吉克族","怒族","乌孜别克族","俄罗斯族","鄂温克族","德昂族","保安族","裕固族","京族","塔塔尔族","独龙族","鄂伦春族","赫哲族","门巴族","珞巴族","基诺族","各族"];
-const openai = new OpenAI({
-	apiKey: process.env.DASHSCOPE_API_KEY,
-	baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-});
 const browser = await puppeteer.launch({
 	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 });
-for (const media of mediaArr) { // Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding would exhaust its concurrency limit, and parallel calls to openai.chat.completions.create() would hang.
+for (const media of mediaArr) { // Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding would exhaust its concurrency limit, and parallel POSTs to dashscope.aliyuncs.com would hang.
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	console.log(media.dir, media.date, media.weekday, media.fileArr.length);
 	await Promise.all(media.fileArr.map(async (file) => {
@@ -157,18 +152,25 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 	}
 	media.town = town;
 	console.log(media.country, media.province, media.city, media.district, media.town);
-	const completion = await openai.chat.completions.create({
-		model: "qwen-turbo", // https://help.aliyun.com/zh/model-studio/what-is-qwen-llm
-		messages: [{
-			"role": "user",
-			"content": [{
-				"type": "text",
-				"text": `介绍${media.country}${media.province}${media.city}${media.district}${media.town}的四个旅游景点。输出JSON。字段poem是字符串数组，包含四句七律诗描绘这些景点，每句包含七个字和一个标点符号。字段sites是字符串数组，包含四句，每句开头是景点的名字，然后用自然语言详细介绍景点、地址、游玩月份。`,
-			}],
-		}],
-		response_format: {
-			type: 'json_object',
+	const completion = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+		method: 'POST',
+		headers: {
+			'Authorization': `Bearer ${process.env.DASHSCOPE_API_KEY}`,
+			'Content-Type': 'application/json',
 		},
+		body: JSON.stringify({ // https://help.aliyun.com/zh/model-studio/what-is-model-studio#16693d2e3fmir
+			"model": "qwen-turbo", // https://help.aliyun.com/zh/model-studio/what-is-qwen-llm
+			"messages": [{
+				"role": "user", 
+				"content": `介绍${media.country}${media.province}${media.city}${media.district}${media.town}的四个旅游景点。输出JSON。字段poem是字符串数组，包含四句七律诗描绘这些景点，每句包含七个字和一个标点符号。字段sites是字符串数组，包含四句，每句开头是景点的名字，然后用自然语言详细介绍景点、地址、游玩月份。`
+			}],
+			response_format: {
+				type: 'json_object',
+			},
+		}),
+	}).then(response => {
+		console.assert(response.ok, 'response.status', response.status, 'response.statusText', response.statusText);
+		return response.json();
 	});
 	media.description = JSON.parse(completion.choices[0].message.content);
 	const { poem } = media.description;
