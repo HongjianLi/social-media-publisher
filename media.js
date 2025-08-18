@@ -23,7 +23,7 @@ for (const dir of dirArr) {
 console.log(`Expanded to ${mediaArr.length} medias.`);
 console.assert(mediaArr.length);
 const minorities = ["蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族","哈尼族","哈萨克族","傣族","黎族","傈僳族","佤族","畲族","高山族","拉祜族","水族","东乡族","纳西族","景颇族","柯尔克孜族","土族","达斡尔族","仫佬族","羌族","布朗族","撒拉族","毛南族","仡佬族","锡伯族","阿昌族","普米族","塔吉克族","怒族","乌孜别克族","俄罗斯族","鄂温克族","德昂族","保安族","裕固族","京族","塔塔尔族","独龙族","鄂伦春族","赫哲族","门巴族","珞巴族","基诺族","各族"];
-for (const media of mediaArr) { // Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding would exhaust its concurrency limit, and parallel POSTs to dashscope.aliyuncs.com would hang.
+for (const media of mediaArr) { // Use sequential loop instead of promise.all, because parallel requests to api.map.baidu.com/reverse_geocoding or dashscope.aliyuncs.com would exhaust their concurrency limit, e.g. QPS for reverse geocoding is 30 according to https://lbs.baidu.com/apiconsole/quota, 每分钟调用次数（RPM） for qwen-turbo is 60 according to https://help.aliyun.com/zh/model-studio/rate-limit
 	media.weekday = `周${['日', '一', '二', '三', '四', '五', '六'][(new Date(`${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`)).getDay()]}`;
 	console.log(media.dir, media.date, media.weekday, media.fileArr.length);
 	await Promise.all(media.fileArr.map(async (file) => {
