@@ -13,7 +13,7 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 	]);
 	await page.type('div._description_2klkp_59', `${media.title}\n🌲\n${media.description}`); // Max 500 characters
 	await page.click('input#rc_select_1'); // 添加地点
-	await new Promise(resolve => setTimeout(resolve, 4000 * media.fileArr.length ));
+	await new Promise(resolve => setTimeout(resolve, 2000 * (2 + media.fileArr.length)));
 	await page.click('ul.ant-cascader-menu>li:nth-child(1)'); // Select the first city.
 	await new Promise(resolve => setTimeout(resolve, 1000));
 //	await page.click('input#rc_select_2'); // 详细地址  No addresses will be shown.

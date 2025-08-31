@@ -14,7 +14,7 @@ browse('https://mp.toutiao.com/profile_v4/weitoutiao/publish', 18, async (page, 
 		page.waitForSelector('button[data-e2e="imageUploadConfirm-btn"]'),
 		fileChooser.accept(media.fileArr),
 	]);
-	await new Promise(resolve => setTimeout(resolve, 4000 * media.fileArr.length));
+	await new Promise(resolve => setTimeout(resolve, 2000 * (2 + media.fileArr.length)));
 	await page.click('button[data-e2e="imageUploadConfirm-btn"]');
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.type('div.ProseMirror', `${media.title}\n🌲\n${media.description}`); // Max 2000 characters.
