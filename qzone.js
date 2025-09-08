@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import browse from './browser.js';
-browse('https://user.qzone.qq.com/896034685/311', 9, async (page, media) => { // Max 18 pictures.
+browse('https://user.qzone.qq.com/439629497/311', 9, async (page, media) => { // Max 18 pictures.
 	const frameHandle = await page.waitForSelector('iframe[id="app_canvas_frame"]');
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	const frame = await frameHandle.contentFrame();
