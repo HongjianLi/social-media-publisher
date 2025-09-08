@@ -14,10 +14,10 @@ browse('https://creator.xiaohongshu.com/publish/publish', 18, async (page, media
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.type('input.d-text', media.title); // Max 20 characters
-	await page.type('div.ql-editor', media.description); // Max 1000 characters.
+	await page.type('div.tiptap', media.description); // Max 1000 characters.
 	await page.type('div.address-box div.d-select-input-filter>input', media.address); // 添加地点
-	await new Promise(resolve => setTimeout(resolve, 3000));
-	await page.click('div[data-v-5802f96c].item'); // 选择第一个地点
+	await new Promise(resolve => setTimeout(resolve, 8000));
+	await page.click('div[data-v-1452d0b4].item'); // 选择第一个地点
 	await page.click('span.btn-text.red::-p-text(去声明)'); // 去声明
 	await page.click('div.d-checkbox.bg-red'); // 我已阅读并同意 《原创声明须知》 ，如滥用声明，平台将驳回并予以相关处置
 	await page.click('button::-p-text(声明原创)'); // 声明原创
