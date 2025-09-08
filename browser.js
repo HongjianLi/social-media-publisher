@@ -6,6 +6,7 @@ export default async (url, numFiles = 9, pageHandler) => {
 		headless: false,
 		defaultViewport: { width: 1440, height: 1400 },
 		args: ['--start-fullscreen'],
+//		protocolTimeout: 10 * 37000, // Default is 180000
 	});
 	await browser.defaultBrowserContext().overridePermissions(url.split('/').slice(0, 3).join('/'), ['geolocation']); // https://pptr.dev/api/puppeteer.browsercontext.overridepermissions
 	await fs.readFile('cookies.json').then(JSON.parse).then(cookies => browser.setCookie(...cookies));
