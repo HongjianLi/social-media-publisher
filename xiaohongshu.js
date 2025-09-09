@@ -34,7 +34,7 @@ browse('https://creator.xiaohongshu.com/publish/publish', 18, async (page, media
 	await page.type('input[placeholder="下拉选择日期"]', `${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`); // 拍摄日期
 	await new Promise(resolve => setTimeout(resolve, 1000 ));
 	await page.click('button::-p-text(发布)'); // 确认
-	await new Promise(resolve => setTimeout(resolve, 2000 * (2 + media.fileArr.length)));
+	await new Promise(resolve => setTimeout(resolve, 4000 * (2 + media.fileArr.length)));
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2' }),
 		page.click('div.submit>button'),

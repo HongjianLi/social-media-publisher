@@ -8,7 +8,7 @@ browse('https://weibo.com/', 18, async (page, media) => { // Max 18 pictures.
 	]);
 	console.assert(fileChooser.isMultiple());
 	await Promise.all([
-		new Promise(resolve => setTimeout(resolve, 2000 * (2 + media.fileArr.length))),
+		new Promise(resolve => setTimeout(resolve, 4000 * (2 + media.fileArr.length))),
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.click('div.Tool_mar1_3dorR>div:last-of-type'); // 更多
