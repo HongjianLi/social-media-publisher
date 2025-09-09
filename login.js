@@ -41,7 +41,7 @@ const siteArr = [{
 		domain: '.weibo.com',
 	},
 }, {
-	url: 'https://user.qzone.qq.com/896034685/311',
+	url: 'https://user.qzone.qq.com/439629497/311',
 	cookie: {
 		name: 'p_skey',
 		domain: '.qzone.qq.com',
