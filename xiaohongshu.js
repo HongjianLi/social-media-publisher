@@ -34,7 +34,7 @@ browse('https://creator.xiaohongshu.com/publish/publish', 18, async (page, media
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.type('input[placeholder="下拉选择日期"]', `${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`); // 拍摄日期
 	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.click('button::-p-text(发布)'); // 确认
+	await page.click('button::-p-text(确认)'); // 确认
 	await new Promise(resolve => {
 		const interval = setInterval(async () => {
 			const uploadingCount = await page.$$eval('div.img-upload-area div.mask.uploading', nodeList => nodeList.length); // When upload completes, uploadingCount will be equal to 0
