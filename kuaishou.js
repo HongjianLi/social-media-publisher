@@ -8,7 +8,7 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 	]);
 	console.assert(fileChooser.isMultiple());
 	await Promise.all([
-		page.waitForSelector('div._upload_swpvr_1', { timeout: 4000 * (2 + media.fileArr.length) }), // When upload completes, this div 编辑图片 will be shown.
+		page.waitForSelector('div._upload_swpvr_1', { timeout: 6000 * (2 + media.fileArr.length) }), // When upload completes, this div 编辑图片 will be shown.
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.type('div._description_2klkp_59', `${media.title}\n🌲\n${media.description}`); // Max 500 characters

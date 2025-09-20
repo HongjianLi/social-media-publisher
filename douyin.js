@@ -9,7 +9,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	]);
 	console.assert(fileChooser.isMultiple());
 	await Promise.all([
-		page.waitForSelector('div.info-jvSF_5', { timeout: 4000 * (2 + media.fileArr.length)}), // When upload completes, <div class="info-jvSF_5"> will be shown.
+		page.waitForSelector('div.info-jvSF_5', { timeout: 6000 * (2 + media.fileArr.length)}), // When upload completes, <div class="info-jvSF_5"> will be shown.
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.click('div.container-JweCrL>div>label:last-of-type>input'); // 保存权限 不允许
