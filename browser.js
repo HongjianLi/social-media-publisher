@@ -5,7 +5,7 @@ export default async (url, numFiles = 9, pageHandler) => {
 		executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 		headless: false,
 		defaultViewport: { width: 1440, height: 1400 },
-		args: ['--start-fullscreen'],
+		args: ['--window-size=1440,1400'],
 //		protocolTimeout: 10 * 37000, // Default is 180000
 	});
 	await browser.defaultBrowserContext().overridePermissions(url.split('/').slice(0, 3).join('/'), ['geolocation']); // https://pptr.dev/api/puppeteer.browsercontext.overridepermissions

@@ -5,7 +5,8 @@ const cookies = await fs.readFile('cookies.json').then(JSON.parse);
 const browser = await puppeteer.launch({
 	executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 	headless: false,
-	defaultViewport: { width: 1024, height: 768 },
+	defaultViewport: { width: 1440, height: 1400 },
+	args: ['--window-size=1440,1400'],
 });
 await browser.setCookie(...cookies);
 const siteArr = [{
