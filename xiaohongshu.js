@@ -13,10 +13,10 @@ browse('https://creator.xiaohongshu.com/publish/publish', 18, async (page, media
 		page.waitForSelector('input.d-text'),
 		fileChooser.accept(media.fileArr),
 	]);
-	const addressAttr = await page.$eval('div.media-extension>div.formbox>div.plugin:nth-child(2)>div>form', el => el.attributes[0].name); // e.g. data-v-1452d0b4
 	await page.type('input.d-text', media.title); // Max 20 characters
 	await page.type('div.tiptap', media.description); // Max 1000 characters.
 	await page.type('div.address-box div.d-select-input-filter>input', media.address); // 添加地点
+	const addressAttr = await page.$eval('div.media-extension>div.formbox>div.plugin:nth-child(2)>div>form', el => el.attributes[0].name); // e.g. data-v-1452d0b4
 	await page.waitForSelector(`div[${addressAttr}].item`);
 	await page.click(`div[${addressAttr}].item`); // 选择第一个地点
 	await page.click('span.btn-text.red::-p-text(去声明)'); // 去声明
