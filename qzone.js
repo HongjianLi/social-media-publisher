@@ -17,13 +17,12 @@ browse('https://user.qzone.qq.com/439629497/311', 9, async (page, media) => { //
 			frame.click('li.qz_poster_btn_local_pic'),
 		]);
 		console.assert(!fileChooser.isMultiple());
-		await Promise.all([
-			frame.waitForSelector('ul.img-item-list>li:last-of-type>div.thumbnail>img[src^="http://photogzmaz.photo.store.qq.com/"]'), // When upload completes, the <img src=""> attribute will be changed to e.g. http://photogzmaz.photo.store.qq.com/psc?/V51IVfMS1ES2yk3CC9421L1OT04Wnbtj/LiySpxowE0yeWXwBdXN*SeTTAEu7N6a7sXEmyAyBSYdrwOiEmOSAiPoCiZzY4fru6y.43v8ACQyz.k35kh4Js04Gxf3yX51zIRCWfjouEZo!/a&bo=OASgBQAAAAAWELk!
-			fileChooser.accept(media.fileArr.slice(i, i + 1)),
-		]);
+		await fileChooser.accept(media.fileArr.slice(i, i + 1));
+		await new Promise(resolve => setTimeout(resolve, 1000));
+		await frame.waitForSelector('ul.img-item-list>li:last-of-type>div.thumbnail>img[src^="http://photogzmaz.photo.store.qq.com/"]'); // When upload completes, the <img src=""> attribute will be changed to e.g. http://photogzmaz.photo.store.qq.com/psc?/V51IVfMS1ES2yk3CC9421L1OT04Wnbtj/LiySpxowE0yeWXwBdXN*SeTTAEu7N6a7sXEmyAyBSYdrwOiEmOSAiPoCiZzY4fru6y.43v8ACQyz.k35kh4Js04Gxf3yX51zIRCWfjouEZo!/a&bo=OASgBQAAAAAWELk!
 	}
-	await new Promise(resolve => setTimeout(resolve, 2000)),
+	await new Promise(resolve => setTimeout(resolve, 1000)),
 	await frame.click('a.btn-post'),
-	await new Promise(resolve => setTimeout(resolve, 5000));
+	await new Promise(resolve => setTimeout(resolve, 3000));
 	await frameHandle.dispose();
 });
