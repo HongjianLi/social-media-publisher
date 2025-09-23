@@ -10,7 +10,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.type('input[placeholder="添加作品标题"]', media.title); // Max 20 characters
 	await page.type('div[data-placeholder="添加作品描述..."]', media.description); // Max 1000 characters.
 	await page.click('div.container-JweCrL>div>label:last-of-type>input'); // 保存权限 不允许
-	if (media.date.substring(0, 4) >= '2020') {
+	if (media.date.substring(0, 4) >= '2020') { // 抖音的添加声明仅支持2020年或之后
 		await page.click('p.addUserDeclaration-dq21tU'); // 添加声明
 		await new Promise(resolve => setTimeout(resolve, 2000));
 		await page.click('div.radioEl-QlABcQ'); // 内容自行拍摄
