@@ -1,17 +1,14 @@
 #!/usr/bin/env node
 import browse from './browser.js';
 browse('https://creator.douyin.com/creator-micro/content/publish-media/image-text', 35, async (page, media) => { // Max 35 pictures.
-	await page.type('input[placeholder="添加作品标题"]', media.title); // Max 20 characters
-	await page.type('div[data-placeholder="添加作品描述..."]', media.description); // Max 1000 characters.
 	const [fileChooser] = await Promise.all([
 		page.waitForFileChooser(),
 		page.click('div.container-IRuUu2'),
 	]);
 	console.assert(fileChooser.isMultiple());
-	await Promise.all([
-		page.waitForSelector('div.info-jvSF_5', { timeout: 6000 * (2 + media.fileArr.length)}), // When upload completes, <div class="info-jvSF_5"> will be shown.
-		fileChooser.accept(media.fileArr),
-	]);
+	await fileChooser.accept(media.fileArr);
+	await page.type('input[placeholder="添加作品标题"]', media.title); // Max 20 characters
+	await page.type('div[data-placeholder="添加作品描述..."]', media.description); // Max 1000 characters.
 	await page.click('div.container-JweCrL>div>label:last-of-type>input'); // 保存权限 不允许
 	if (media.date.substring(0, 4) >= '2020') {
 		await page.click('p.addUserDeclaration-dq21tU'); // 添加声明
@@ -56,7 +53,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.click('div.card-wrapper-JTleG1'); // 选择第一首音乐
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('button.apply-btn-LUPP0D'); // 使用
-	await new Promise(resolve => setTimeout(resolve, 2000));
+	await page.waitForSelector('div.info-jvSF_5', { timeout: 6000 * (2 + media.fileArr.length)}); // When upload completes, <div class="info-jvSF_5"> will be shown.
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2' }),
 		page.click('button.primary-cECiOJ'),

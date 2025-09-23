@@ -7,10 +7,8 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 		page.click('button._upload-btn_ysbff_57'),
 	]);
 	console.assert(fileChooser.isMultiple());
-	await Promise.all([
-		page.waitForSelector('div._upload_swpvr_1', { timeout: 6000 * (2 + media.fileArr.length) }), // When upload completes, this div 编辑图片 will be shown.
-		fileChooser.accept(media.fileArr),
-	]);
+	await fileChooser.accept(media.fileArr);
+	await page.waitForSelector('div._description_2klkp_59');
 	await page.type('div._description_2klkp_59', `${media.title}\n🌲\n${media.description}`); // Max 500 characters
 	await page.click('input#rc_select_1'); // 添加地点
 	await new Promise(resolve => setTimeout(resolve, 6000));
@@ -26,7 +24,7 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 	await page.waitForSelector('span._button_19mmt_162'); // 等待添加按钮
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('span._button_19mmt_162'); // 添加
-	await new Promise(resolve => setTimeout(resolve, 2000));
+	await page.waitForSelector('div._upload_swpvr_1', { timeout: 6000 * (2 + media.fileArr.length) }), // When upload completes, this div 编辑图片 will be shown.
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2' }),
 		page.click('div._button-primary_3a3lq_60'),
