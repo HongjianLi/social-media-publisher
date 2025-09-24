@@ -11,7 +11,7 @@ export default async (url, numFiles = 9, pageHandler) => {
 	await browser.defaultBrowserContext().overridePermissions(url.split('/').slice(0, 3).join('/'), ['geolocation']); // https://pptr.dev/api/puppeteer.browsercontext.overridepermissions
 	await fs.readFile('cookies.json').then(JSON.parse).then(cookies => browser.setCookie(...cookies));
 	const mediaArr = await fs.readFile('media.json').then(JSON.parse);
-	for (const media of mediaArr.slice(36, 38)) {
+	for (const media of mediaArr) {
 //		if (!(media.date >= '20250416')) continue; // Used to filter medias to publish.
 		console.log(media.date, media.weekday, media.province, media.city, media.district, media.town);
 		if (media.fileArr.length > numFiles) {
