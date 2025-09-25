@@ -22,7 +22,7 @@ browse('https://mp.toutiao.com/profile_v4/weitoutiao/publish', 18, async (page, 
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.type('span.byte-select-view-search>input', media.address); // 标记位置，让更多用户看到
 	await new Promise(resolve => setTimeout(resolve, 4000));
-	try { await page.click('ul.byte-select-popup-inner>li'); } catch {} // 选择第一个位置  可能会出现“暂无数据”
+	try { await page.click('ul.byte-select-popup-inner>li'); } catch { await page.click('body'); } // 选择第一个位置  可能会出现“暂无数据”
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
