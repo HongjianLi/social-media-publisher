@@ -37,8 +37,12 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.click('div.select-Ht3mEC'); // 输入相关位置
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.type('div.select-Ht3mEC', media.address); // 输入相关位置
-	await new Promise(resolve => setTimeout(resolve, 3000)); // 等待加载位置
-	await page.click('div.option-v2-eZrjiM'); // 选择该城市下的第一个位置
+	try {
+		await page.waitForSelector('div.option-v2-eZrjiM', { timeout: 5000 }); // 等待加载位置
+		await page.click('div.option-v2-eZrjiM'); // 选择第一个位置
+	} catch {
+		await page.click('body');
+	}
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('span.action-Q1y01k'); // 选择音乐
 	await new Promise(resolve => setTimeout(resolve, 2000));
