@@ -30,8 +30,10 @@ browse('https://creator.xiaohongshu.com/publish/publish', 18, async (page, media
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.type('input[placeholder="下拉选择地点"]', media.address); // 拍摄地点
 	await new Promise(resolve => setTimeout(resolve, 4000 ));
-	await page.click('div[id^="el-popper-container-"] ul>li'); // 选择第一个地点
-	await new Promise(resolve => setTimeout(resolve, 1000));
+	try {
+		await page.click('div[id^="el-popper-container-"] ul>li'); // 选择第一个地点
+		await new Promise(resolve => setTimeout(resolve, 1000));
+	} catch {}
 	await page.type('input[placeholder="下拉选择日期"]', `${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`); // 拍摄日期
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('button::-p-text(确认)'); // 确认
