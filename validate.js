@@ -3,8 +3,8 @@ import fs from 'fs/promises';
 const mediaArr = await fs.readFile(`media.json`).then(JSON.parse);
 console.log(mediaArr.length);
 const countArr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-mediaArr.forEach(media => {
-	console.log(media.date, media.weekday, media.country, media.province, media.city, media.district, media.town, media.fileArr.length);
+mediaArr.forEach((media, index) => {
+	console.log(index, media.date, media.weekday, media.country, media.province, media.city, media.district, media.town, media.fileArr.length);
 	console.assert(media.fileArr.length);
 	console.assert(media.latitude !== undefined);
 	console.assert(media.altitude <= 99999);
