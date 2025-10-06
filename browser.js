@@ -13,13 +13,13 @@ export default async (url, numFiles = 9, pageHandler) => {
 	const mediaArr = await fs.readFile('media.json').then(JSON.parse);
 	for (const media of mediaArr) {
 //		if (!(media.date >= '20250416')) continue; // Used to filter medias to publish.
-		console.log(media.date, media.weekday, media.province, media.city, media.district, media.town);
+		console.log(media.date, media.weekday, media.province, media.city, media.district, media.town, media.fileArr.length);
 		if (media.fileArr.length > numFiles) {
 			const segmentSize = media.fileArr.length / numFiles;
 			const indexArr = [...Array(numFiles).keys()].map(i => {
 				return Math.round((segmentSize * (2 * i + 1) - 1) / 2);
 			});
-			media.fileArr =  media.fileArr.filter((_, index) => indexArr.includes(index));
+			media.fileArr = media.fileArr.filter((_, index) => indexArr.includes(index));
 		}
 		const page = await browser.newPage();
 		await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0');
