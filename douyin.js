@@ -38,21 +38,18 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.type('div.select-Ht3mEC', media.address); // 输入相关位置
 	try {
-		await page.waitForSelector('div.option-v2-eZrjiM', { timeout: 5000 }); // 等待加载位置
+		await page.waitForSelector('div.option-v2-eZrjiM'); // 等待加载位置
 		await page.click('div.option-v2-eZrjiM'); // 选择第一个位置
 	} catch {
 		await page.click('body');
 	}
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('span.action-Q1y01k'); // 选择音乐
-	await new Promise(resolve => setTimeout(resolve, 2000));
+	await page.waitForSelector('div[data-scrollkey="fav-1-bar"]');
 	await page.click('div[data-scrollkey="fav-1-bar"]'); // 收藏
 //	await page.type('input[placeholder="搜索音乐"]', '先敬罗衣后敬人 许冠杰'); // 搜索音乐
-	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.waitForSelector('div.card-wrapper-JTleG1'); // 等待加载音乐
-	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('div.card-wrapper-JTleG1'); // 选择第一首音乐
-	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('button.apply-btn-LUPP0D'); // 使用
 	await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for the music side panel to close.
 	await page.waitForSelector('div.info-jvSF_5', { timeout: 8000 * (2 + media.fileArr.length)}); // When upload completes, <div class="info-jvSF_5"> will be shown.
