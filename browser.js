@@ -24,7 +24,7 @@ export default async (url, numFiles = 9, pageHandler) => {
 		const page = await browser.newPage();
 		await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0');
 		await page.setGeolocation({ latitude: media.latitude, longitude: media.longitude }); // https://pptr.dev/api/puppeteer.page.setgeolocation
-		const response = await page.goto(url, { waitUntil: 'networkidle2' });
+		const response = await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
 //		console.assert(response.ok()); // kuaishou would fail this assertion.
 		console.assert(page.url() === url);
 		media.fileArr = media.fileArr.map(file => `${media.dir}/${file}`);
