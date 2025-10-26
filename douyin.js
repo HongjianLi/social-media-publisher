@@ -55,7 +55,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.waitForSelector('div.info-jvSF_5', { timeout: 8000 * (2 + media.fileArr.length)}); // When upload completes, <div class="info-jvSF_5"> will be shown.
 	await new Promise(resolve => setTimeout(resolve, 500));
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2' }),
+		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 60000 }), // Set a long timeout to either input password or receive verification SMS text.
 		page.click('button.primary-cECiOJ'),
 	]);
 });
