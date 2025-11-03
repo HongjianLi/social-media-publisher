@@ -54,7 +54,7 @@ for (const site of siteArr) {
 	const response = await page.goto(url, { waitUntil: 'networkidle2' });
 	if (response.ok()) {
 		if (page.url() !== url || (site.selector && await page.$(site.selector))) { // Page redirected because of invalid cookies for user login. douyin and kuaishou will not redirect, but login selectors will be found.
-			await page.waitForNavigation(); // Scan QR code to login. Default timeout is 30 seconds.
+			await page.waitForNavigation({ timeout: 60000 }); // Scan QR code to login. Default timeout is 30 seconds.
 			const cookie = await browser.cookies().then(cookies => cookies.find(cookie => cookie.name === name && cookie.domain === domain)); // After login, find the credential cookie.
 			if (cookie) cookies.find(cookie => cookie.name === name && cookie.domain === domain).value = cookie.value; // Save the credential cookie value.
 		}
