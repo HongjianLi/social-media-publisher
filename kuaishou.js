@@ -18,7 +18,7 @@ browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (pag
 	await page.waitForSelector('span._button_19mmt_162'); // 等待添加按钮
 	await page.click('span._button_19mmt_162'); // 添加
 	await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for the music side panel to close.
-	await page.waitForSelector('div._upload_swpvr_1', { timeout: 8000 * (2 + media.fileArr.length) }), // When upload completes, this div 编辑图片 will be shown.
+	await page.waitForSelector('div._upload_swpvr_1', { timeout: 10000 * (2 + media.fileArr.length) }), // When upload completes, this div 编辑图片 will be shown.
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2' }),
 		page.click('div._button-primary_3a3lq_60'),

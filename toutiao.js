@@ -11,7 +11,7 @@ browse('https://mp.toutiao.com/profile_v4/weitoutiao/publish', 18, async (page, 
 	]);
 	console.assert(fileChooser.isMultiple());
 	await Promise.all([
-		page.waitForSelector('button[data-e2e="imageUploadConfirm-btn"]:not([disabled])', { timeout: 8000 * (2 + media.fileArr.length)}), // When upload starts, the button will be shown, with the disabled attribute. When upload completes, the disabled attribute will be removed.
+		page.waitForSelector('button[data-e2e="imageUploadConfirm-btn"]:not([disabled])', { timeout: 10000 * (2 + media.fileArr.length)}), // When upload starts, the button will be shown, with the disabled attribute. When upload completes, the disabled attribute will be removed.
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.click('button[data-e2e="imageUploadConfirm-btn"]:not([disabled])');

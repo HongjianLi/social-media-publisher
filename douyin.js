@@ -53,7 +53,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.click('div.card-wrapper-JTleG1'); // 选择第一首音乐
 	await page.click('button.apply-btn-LUPP0D'); // 使用
 	await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for the music side panel to close.
-	await page.waitForSelector('div.info-jvSF_5', { timeout: 8000 * (2 + media.fileArr.length)}); // When upload completes, <div class="info-jvSF_5"> will be shown.
+	await page.waitForSelector('div.info-jvSF_5', { timeout: 10000 * (2 + media.fileArr.length)}); // When upload completes, <div class="info-jvSF_5"> will be shown.
 // Uncomment the following code to reset the tag from 游戏手柄 to 位置
 //	await new Promise(resolve => setTimeout(resolve, 4000));
 //	await page.click('div.select-GDaqAd'); // 点击添加标签
