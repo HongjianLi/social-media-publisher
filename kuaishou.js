@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import browse from './browser.js';
 browse('https://cp.kuaishou.com/article/publish/video?tabType=2', 31, async (page, media) => { // Max 31 pictures.
-	await page.waitForSelector('button._upload-btn_ysbff_57', { timeout: 8000 });
+	await page.waitForSelector('button._upload-btn_ysbff_57');
 	const [fileChooser] = await Promise.all([
 		page.waitForFileChooser(),
 		page.click('button._upload-btn_ysbff_57'),
