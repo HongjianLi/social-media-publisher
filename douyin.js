@@ -39,6 +39,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.type('div.select-Ht3mEC', media.address); // 输入相关位置
 	try {
 		await page.waitForSelector('div.option-v2-eZrjiM'); // 等待加载位置
+		await new Promise(resolve => setTimeout(resolve, 300));
 		await page.click('div.option-v2-eZrjiM'); // 选择第一个位置
 	} catch {
 		await page.click('body');
