@@ -62,7 +62,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 //	await new Promise(resolve => setTimeout(resolve, 1000));
 	await new Promise(resolve => setTimeout(resolve, 500));
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 60000 }), // Set a long timeout to either input password or receive verification SMS text.
+		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 90000 }), // Set a long timeout to either input password or receive verification SMS text.
 		page.click('button.primary-cECiOJ'),
 	]);
 });
