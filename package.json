@@ -12,5 +12,8 @@
 	"dependencies": {
 		"exifreader": "^4.32.0",
 		"puppeteer-core": "^23.11.1"
+	},
+	"scripts": {
+		"start": "node douyin.js; node toutiao.js; node kuaishou.js; node xiaohongshu.js; node weibo.js;"
 	}
 }
