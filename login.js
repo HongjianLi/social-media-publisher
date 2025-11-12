@@ -30,7 +30,7 @@ const siteArr = [{
 		domain: '.kuaishou.com',
 	},
 }, {
-	url: 'https://creator.xiaohongshu.com/publish/publish',
+	url: 'https://creator.xiaohongshu.com/publish/publish?target=image',
 	cookie: {
 		name: 'access-token-creator.xiaohongshu.com',
 		domain: '.xiaohongshu.com',
