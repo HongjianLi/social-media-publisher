@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import browse from './browser.js';
 browse('https://creator.xiaohongshu.com/publish/publish?target=image', 18, async (page, media) => { // Max 18 pictures.
+	await page.waitForSelector('input.upload-input');
 	const [fileChooser] = await Promise.all([
 		page.waitForFileChooser(),
 		page.click('input.upload-input'),
