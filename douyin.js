@@ -60,8 +60,20 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 		await page.click('body');
 	}
 	await new Promise(resolve => setTimeout(resolve, 500));
+	let timeout = false;
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 90000 }), // Set a long timeout to either input password or receive verification SMS text.
+		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 9000 }),
 		page.click('button.primary-cECiOJ'),
+	]).catch(e => { timeout = true });
+	if (!timeout) return;
+	await page.click('span.href'); // 选择其他验证方式
+	await page.waitForSelector('div.uc-ui-lists_item_wrap');
+	await page.click('div.uc-ui-lists_item_wrap:nth-child(2)'); // 登录密码验证
+	await page.waitForSelector('input[type="password"]');
+	await page.click('input[type="password"]'); // 请输入密码
+	await page.type('input[type="password"]', process.env.DOUYIN_PASSWORD);
+	await Promise.all([
+		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 9000 }),
+		page.click('div.uc-ui-verify_password-verify_button:not(.second)'), // 验证
 	]);
 });
