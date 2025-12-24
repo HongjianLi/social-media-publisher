@@ -10,6 +10,7 @@ browse('https://mp.toutiao.com/profile_v4/weitoutiao/publish', 18, async (page, 
 		page.click('div.btns-wrapper>button:nth-child(1)'),
 	]);
 	console.assert(fileChooser.isMultiple());
+	await new Promise(resolve => setTimeout(resolve, 100));
 	await Promise.all([
 		page.waitForSelector('button[data-e2e="imageUploadConfirm-btn"]:not([disabled])', { timeout: 10000 * (2 + media.fileArr.length)}), // When upload starts, the button will be shown, with the disabled attribute. When upload completes, the disabled attribute will be removed.
 		fileChooser.accept(media.fileArr),
