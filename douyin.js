@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import browse from './browser.js';
-browse('https://creator.douyin.com/creator-micro/content/publish-media/image-text', 35, async (page, media) => { // Max 35 pictures.
+const url = 'https://creator.douyin.com/creator-micro/content/publish-media/image-text';
+browse(url, 35, async (page, media) => { // Max 35 pictures.
 	const [fileChooser] = await Promise.all([
 		page.waitForFileChooser(),
 		page.click('div.container-IRuUu2'),
@@ -48,7 +49,8 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.click('div.select-GDaqAd'); // 点击添加标签
 	await page.waitForSelector('div.semi-select-option');
 	await page.click('div.semi-select-option'); // 选择第一个选项，即"位置". Reset the tag from either 位置 or 游戏手柄 to always 位置
-	await new Promise(resolve => setTimeout(resolve, 500));
+	await page.waitForSelector('div.select-Ht3mEC');
+	await new Promise(resolve => setTimeout(resolve, 100));
 	await page.click('div.select-Ht3mEC'); // 点击输入相关位置
 	await new Promise(resolve => setTimeout(resolve, 300));
 	await page.type('div.select-Ht3mEC', media.address); // 输入相关位置
@@ -60,12 +62,14 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 		await page.click('body');
 	}
 	await new Promise(resolve => setTimeout(resolve, 500));
-	let timeout = false;
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 9000 }),
-		page.click('button.primary-cECiOJ'),
-	]).catch(e => { timeout = true });
-	if (!timeout) return;
+		Promise.any([
+			page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 12000 }), // 若发布成功，页面将重定向至https://creator.douyin.com/creator-micro/content/manage?enter_from=publish
+			page.waitForSelector('span.href', { timeout: 12000 }), // 若sessionid更新，页面将要求验证
+		]),
+		page.click('button.primary-cECiOJ'), // 发布
+	]);
+	if (page.url() !== url) return; // 发布成功
 	await page.click('span.href'); // 选择其他验证方式
 	await page.waitForSelector('div.uc-ui-lists_item_wrap');
 	await page.click('div.uc-ui-lists_item_wrap:nth-child(2)'); // 登录密码验证
@@ -73,7 +77,7 @@ browse('https://creator.douyin.com/creator-micro/content/publish-media/image-tex
 	await page.click('input[type="password"]'); // 请输入密码
 	await page.type('input[type="password"]', process.env.DOUYIN_PASSWORD);
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 9000 }),
+		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 12000 }),
 		page.click('div.uc-ui-verify_password-verify_button:not(.second)'), // 验证
 	]);
 });
