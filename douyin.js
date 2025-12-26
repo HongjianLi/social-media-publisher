@@ -75,7 +75,7 @@ browse(url, 35, async (page, media) => { // Max 35 pictures.
 	await page.click('div.uc-ui-lists_item_wrap:nth-child(2)'); // 登录密码验证
 	await page.waitForSelector('input[type="password"]');
 	await page.click('input[type="password"]'); // 请输入密码
-	await page.type('input[type="password"]', process.env.DOUYIN_PASSWORD);
+	await page.type('input[type="password"]', process.argv[2]);
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 12000 }),
 		page.click('div.uc-ui-verify_password-verify_button:not(.second)'), // 验证
