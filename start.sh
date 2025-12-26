@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 echo "$(date +"%F %T.%N") Script started"
-export PUPPETEER_EXECUTABLE_PATH=/opt/google/chrome/chrome
+export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 echo "$(date +"%F %T.%N") node media.js"
 node media.js
 echo "$(date +"%F %T.%N") node login.js"
