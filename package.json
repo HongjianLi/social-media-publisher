@@ -14,6 +14,6 @@
 		"puppeteer-core": "^23.11.1"
 	},
 	"scripts": {
-		"start": "node douyin.js; node toutiao.js; node kuaishou.js; node xiaohongshu.js; node weibo.js;"
+		"start": "node media.js; node login.js; node douyin.js; node toutiao.js; node kuaishou.js; node xiaohongshu.js; node weibo.js; node qzone.js;"
 	}
 }
