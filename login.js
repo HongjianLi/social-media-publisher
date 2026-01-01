@@ -12,50 +12,26 @@ await browser.setCookie(...cookies);
 const siteArr = [{
 	url: 'https://creator.douyin.com/creator-micro/content/publish-media/image-text',
 	selector: 'span.selected-w_E01s',
-	cookies: [{
-		name: 'sessionid',
-		domain: '.douyin.com',
-	}],
+	domain: '.douyin.com',
 }, {
 	url: 'https://mp.toutiao.com/profile_v4/weitoutiao/publish',
-	cookies: [{
-		name: 'sessionid',
-		domain: '.toutiao.com',
-	}],
+	domain: '.toutiao.com',
 }, {
 	url: 'https://cp.kuaishou.com/article/publish/video?tabType=2',
 	selector: 'a.login',
-	cookies: [{
-		name: 'kuaishou.web.cp.api_st',
-		domain: '.kuaishou.com',
-	}],
+	domain: '.kuaishou.com',
 }, {
 	url: 'https://creator.xiaohongshu.com/publish/publish?target=image',
-	cookies: [{
-		name: 'access-token-creator.xiaohongshu.com',
-		domain: '.xiaohongshu.com',
-	}],
+	domain: '.xiaohongshu.com',
 }, {
 	url: 'https://weibo.com/',
-	cookies: [{
-		name: 'SUB',
-		domain: '.weibo.com',
-	}],
+	domain: '.weibo.com',
 }, {
 	url: 'https://member.bilibili.com/platform/upload/text/edit',
-	cookies: [{
-		name: 'SESSDATA',
-		domain: '.bilibili.com',
-	}, {
-		name: 'bili_jct',
-		domain: '.bilibili.com',
-	}],
+	domain: '.bilibili.com',
 }, {
 	url: 'https://user.qzone.qq.com/439629497/311',
-	cookies: [{
-		name: 'p_skey',
-		domain: '.qzone.qq.com',
-	}],
+	domain: '.qzone.qq.com',
 }];
 for (const site of siteArr) {
 	const page = await browser.newPage();
@@ -64,10 +40,9 @@ for (const site of siteArr) {
 		if (page.url() !== site.url || (site.selector && await page.$(site.selector))) { // Page redirected because of invalid cookies for user login. douyin and kuaishou will not redirect, but login selectors will be found.
 			await page.waitForNavigation({ timeout: 60000 }); // Scan QR code to login. Default timeout is 30 seconds.
 			const browserCookies = await browser.cookies(); // Get the updated cookies from browser.
-			site.cookies.forEach(c => {
-				const { name, domain } = c;
-				const cookie = browserCookies.find(cookie => cookie.name === name && cookie.domain === domain); // After login, find the credential cookie.
-				if (cookie) cookies.find(cookie => cookie.name === name && cookie.domain === domain).value = cookie.value; // Save the credential cookie value.
+			cookies.forEach(cookie => {
+				if (cookie.domain !== site.domain) return; // site.domain can be an array, e.g. domains: ['.qq.com', '.qzone.qq.com']. In this case, use !site.domains.includes(cookie.domain)
+				cookie.value = browserCookies.find(c => c.name === cookie.name && c.domain === cookie.domain).value; // Save the updated cookie value.
 			});
 		}
 	} else {
