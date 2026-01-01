@@ -17,6 +17,8 @@ echo %date% %time% node xiaohongshu.js
 node xiaohongshu.js
 echo %date% %time% node weibo.js
 node weibo.js
+echo %date% %time% node bilibili.js
+node bilibili.js
 echo %date% %time% node qzone.js
 node qzone.js
 echo %date% %time% Script completed

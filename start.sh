@@ -15,6 +15,8 @@ echo "$(date +"%F %T.%N") node xiaohongshu.js"
 node xiaohongshu.js
 echo "$(date +"%F %T.%N") node weibo.js"
 node weibo.js
+echo "$(date +"%F %T.%N") node bilibili.js"
+node bilibili.js
 echo "$(date +"%F %T.%N") node qzone.js"
 node qzone.js
 echo "$(date +"%F %T.%N") Script completed"

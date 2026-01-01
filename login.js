@@ -42,6 +42,12 @@ const siteArr = [{
 		domain: '.weibo.com',
 	},
 }, {
+	url: 'https://member.bilibili.com/platform/upload/text/edit',
+	cookie: {
+		name: 'SESSDATA',
+		domain: '.bilibili.com',
+	},
+}, {
 	url: 'https://user.qzone.qq.com/439629497/311',
 	cookie: {
 		name: 'p_skey',

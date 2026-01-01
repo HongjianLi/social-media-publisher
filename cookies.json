@@ -36,6 +36,18 @@
 		"expires": 2147483646
 	},
 	{
+		"name": "SESSDATA",
+		"value": "",
+		"domain": ".bilibili.com",
+		"expires": 2147483646
+	},
+	{
+		"name": "bili_jct",
+		"value": "",
+		"domain": ".bilibili.com",
+		"expires": 2147483646
+	},
+	{
 		"name": "uin",
 		"value": "",
 		"domain": ".qq.com",
