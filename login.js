@@ -28,6 +28,9 @@ const siteArr = [{
 	url: 'https://weibo.com/',
 	domain: '.weibo.com',
 }, {
+	url: 'https://baijiahao.baidu.com/builder/rc/edit?type=news',
+	domain: '.baidu.com',
+}, {
 	url: 'https://member.bilibili.com/platform/upload/text/edit',
 	domain: '.bilibili.com',
 }, {

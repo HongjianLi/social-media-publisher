@@ -1,7 +1,7 @@
 {
 	"name": "social-media-publisher",
 	"version": "1.0.0",
-	"description": "Publish pictures and texts to social media platforms, e.g. douyin, toutiao, kuaishou, xiaohongshu, weibo, bilibili, qzone.",
+	"description": "Publish pictures and texts to social media platforms, e.g. douyin, toutiao, kuaishou, xiaohongshu, weibo, baijiahao, bilibili, qzone.",
 	"author": "Hongjian Li",
 	"type": "module",
 	"repository": {
@@ -14,6 +14,6 @@
 		"puppeteer-core": "^23.11.1"
 	},
 	"scripts": {
-		"start": "node media.js; node login.js; node douyin.js; node toutiao.js; node kuaishou.js; node xiaohongshu.js; node weibo.js; node bilibili.js; node qzone.js;"
+		"start": "node media.js; node login.js; node douyin.js; node toutiao.js; node kuaishou.js; node xiaohongshu.js; node weibo.js; node baijiahao.js; node bilibili.js; node qzone.js;"
 	}
 }

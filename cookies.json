@@ -36,6 +36,18 @@
 		"expires": 2147483646
 	},
 	{
+		"name": "BDUSS",
+		"value": "",
+		"domain": ".baidu.com",
+		"expires": 2147483646
+	},
+	{
+		"name": "PTOKEN",
+		"value": "",
+		"domain": ".passport.baidu.com",
+		"expires": 2147483646
+	},
+	{
 		"name": "SESSDATA",
 		"value": "",
 		"domain": ".bilibili.com",
