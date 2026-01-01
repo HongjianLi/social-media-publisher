@@ -19,6 +19,7 @@ const siteArr = [{
 }, {
 	url: 'https://cp.kuaishou.com/article/publish/video?tabType=2',
 	selector: 'a.login',
+	login: 'https://passport.kuaishou.com/pc/account/login/',
 	domain: '.kuaishou.com',
 }, {
 	url: 'https://creator.xiaohongshu.com/publish/publish?target=image',
@@ -38,6 +39,7 @@ for (const site of siteArr) {
 	const response = await page.goto(site.url, { waitUntil: 'networkidle2' });
 	if (response.ok()) {
 		if (page.url() !== site.url || (site.selector && await page.$(site.selector))) { // Page redirected because of invalid cookies for user login. douyin and kuaishou will not redirect, but login selectors will be found.
+			if (site.login) await page.goto(site.login); // Browse the login page. Only applicable to kuaishou.
 			await page.waitForNavigation({ timeout: 60000 }); // Scan QR code to login. Default timeout is 30 seconds.
 			const browserCookies = await browser.cookies(); // Get the updated cookies from browser.
 			cookies.forEach(cookie => {
