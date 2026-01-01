@@ -32,7 +32,7 @@ const siteArr = [{
 	domain: '.bilibili.com',
 }, {
 	url: 'https://user.qzone.qq.com/439629497/311',
-	domain: '.qzone.qq.com',
+	domain: '.qq.com',
 }];
 for (const site of siteArr) {
 	const page = await browser.newPage();
@@ -43,7 +43,7 @@ for (const site of siteArr) {
 			await page.waitForNavigation({ timeout: 60000 }); // Scan QR code to login. Default timeout is 30 seconds.
 			const browserCookies = await browser.cookies(); // Get the updated cookies from browser.
 			cookies.forEach(cookie => {
-				if (cookie.domain !== site.domain) return; // site.domain can be an array, e.g. domains: ['.qq.com', '.qzone.qq.com']. In this case, use !site.domains.includes(cookie.domain)
+				if (!cookie.domain.endsWith(site.domain)) return;
 				cookie.value = browserCookies.find(c => c.name === cookie.name && c.domain === cookie.domain).value; // Save the updated cookie value.
 			});
 		}
