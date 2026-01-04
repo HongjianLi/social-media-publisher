@@ -20,13 +20,26 @@ browse('https://baijiahao.baidu.com/builder/rc/edit?type=news', 60, async (page,
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.click('button.css-1ho6t72:not([disabled])');
-	await new Promise(resolve => setTimeout(resolve, 1000));
+	await new Promise(resolve => setTimeout(resolve, 1500));
 	await page.click('div.cheetah-spin-container'); // 选择封面
-	await new Promise(resolve => setTimeout(resolve, 1000));
-	await page.click(`div.e8c90bfac9d4eab4-list>div:nth-child(${Math.ceil(media.fileArr.length / 2)})`); // 选择中间图片作为封面. nth-child() is 1-based, so use ceil() instead of floor().
-	await new Promise(resolve => setTimeout(resolve, 3000));
-	await page.click('button.css-zneqgo'); // 确认
-	await new Promise(resolve => setTimeout(resolve, 1000));
+	await page.waitForSelector('div.e8c90bfac9d4eab4-list>div');
+	await new Promise(resolve => setTimeout(resolve, 500));
+	const nth = Math.ceil(media.fileArr.length / 2);
+	console.assert(nth >= 1);
+	if (nth > 1) await page.click(`div.e8c90bfac9d4eab4-list>div:nth-child(${nth})`); // 选择中间图片作为封面. nth-child() is 1-based, so use ceil() instead of floor(). 网站默认选中第1张图，此时若点击将会取消选中。
+	await new Promise(resolve => setTimeout(resolve, 3000)); // 封面裁剪处理中，请稍候再点击“确认”
+	await new Promise(resolve => {
+		const interval = setInterval(async () => {
+			await page.click('button.css-zneqgo'); // 确认
+			await new Promise(resolve => setTimeout(resolve, 1000));
+			const zneqgo = await page.$('button.css-zneqgo');
+			if (zneqgo) {
+				await zneqgo.dispose();
+			} else {
+				clearInterval(interval);
+				resolve();
+			}
+		}, 3000);
+	});
 	await page.click('button.css-w10alf'); // 发布
-	await new Promise(resolve => setTimeout(resolve, 500)); // Sometimes captcha is required.
 });
