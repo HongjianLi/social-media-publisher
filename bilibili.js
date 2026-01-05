@@ -45,7 +45,7 @@ browse('https://member.bilibili.com/platform/upload/text/edit', 20, async (page,
 	}
 //	Inject these answers [ 'geetest_challenge', 'geetest_validate', 'geetest_seccode' ]
 //	Looks like the answer is returned to the server by creating a new script tag <script src="https://api.geetest.com/ajax.php?gt=&challenge=&w=">
-	await page.$eval('#geetest_validate', (el, answer) => {
+	await frame.$eval('#geetest_validate', (el, answer) => {
 		el.value = answer; // The answer is not guaranteed to be correct.
 	}, resRet.request);
 	await Promise.all([
