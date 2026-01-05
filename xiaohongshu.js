@@ -28,11 +28,11 @@ browse('https://creator.xiaohongshu.com/publish/publish?target=image', 18, async
 	await page.click('div.d-grid-item::-p-text(自主拍摄)');
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.type('input[placeholder="下拉选择地点"]', media.address); // 拍摄地点
-//	await new Promise(resolve => setTimeout(resolve, 6000));
 	try {
 		await page.waitForSelector('div[id^="el-popper-container-"] ul>li', { timeout: 6000 }); // 等待加载地点
+		await new Promise(resolve => setTimeout(resolve, 500));
 		await page.click('div[id^="el-popper-container-"] ul>li'); // 选择第一个地点
-		await new Promise(resolve => setTimeout(resolve, 1000));
+		await new Promise(resolve => setTimeout(resolve, 500));
 	} catch {}
 	await page.type('input[placeholder="下拉选择日期"]', `${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`); // 拍摄日期
 	await new Promise(resolve => setTimeout(resolve, 1000));
