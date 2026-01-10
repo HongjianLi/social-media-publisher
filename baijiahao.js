@@ -20,7 +20,7 @@ browse('https://baijiahao.baidu.com/builder/rc/edit?type=news', 60, async (page,
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.click('button.css-1ho6t72:not([disabled])');
-	await new Promise(resolve => setTimeout(resolve, 1500));
+	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.click('div.cheetah-spin-container'); // 选择封面
 	await page.waitForSelector('div.e8c90bfac9d4eab4-list>div');
 	await new Promise(resolve => setTimeout(resolve, 500));
@@ -41,5 +41,9 @@ browse('https://baijiahao.baidu.com/builder/rc/edit?type=news', 60, async (page,
 			}
 		}, 3000);
 	});
-	await page.click('button.css-w10alf'); // 发布
+	await new Promise(resolve => setTimeout(resolve, 1000));
+	await Promise.all([
+		page.waitForNavigation({ waitUntil: 'networkidle2' }),
+		page.click('button.css-w10alf'), // 发布
+	]);
 });
