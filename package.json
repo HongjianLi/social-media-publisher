@@ -10,8 +10,7 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"exifreader": "^4.33.1",
-		"puppeteer-core": "^23.11.1"
+		"exifreader": "^4.35.0"
 	},
 	"scripts": {
 		"start": "node media.js; node login.js; node douyin.js; node toutiao.js; node kuaishou.js; node xiaohongshu.js; node weibo.js; node baijiahao.js; node bilibili.js; node qzone.js;"
