@@ -1,6 +1,6 @@
+echo off
 set d=%date%
 set date=%d:~6,4%-%d:~3,2%-%d:~0,2%
-echo off
 echo %date% %time% Script started
 set PUPPETEER_EXECUTABLE_PATH=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
 echo %date% %time% node media.js
