@@ -64,8 +64,8 @@ browse(url, 35, async (page, media) => { // Max 35 pictures.
 	await new Promise(resolve => setTimeout(resolve, 500));
 	await Promise.all([
 		Promise.any([
-			page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 12000 }), // 若发布成功，页面将重定向至https://creator.douyin.com/creator-micro/content/manage?enter_from=publish
-			page.waitForSelector('span.href', { timeout: 12000 }), // 若sessionid更新，页面将要求验证
+			page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 18000 }), // 若发布成功，页面将重定向至https://creator.douyin.com/creator-micro/content/manage?enter_from=publish
+			page.waitForSelector('span.href', { timeout: 18000 }), // 若sessionid更新，页面将要求验证
 		]),
 		page.click('button.primary-cECiOJ'), // 发布
 	]);
@@ -77,7 +77,7 @@ browse(url, 35, async (page, media) => { // Max 35 pictures.
 	await page.click('input[type="password"]'); // 请输入密码
 	await page.type('input[type="password"]', process.argv[2]);
 	await Promise.all([
-		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 12000 }),
+		page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 18000 }),
 		page.click('div.uc-ui-verify_password-verify_button:not(.second)'), // 验证
 	]);
 });
