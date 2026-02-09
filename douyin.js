@@ -70,6 +70,7 @@ browse(url, 35, async (page, media) => { // Max 35 pictures.
 		page.click('button.primary-cECiOJ'), // 发布
 	]);
 	if (page.url() !== url) return; // 发布成功
+	if (!process.argv[2]) { console.error('Login password required but not provided'); return; }
 	await page.click('span.href'); // 选择其他验证方式
 	await page.waitForSelector('div.uc-ui-lists_item_wrap');
 	await page.click('div.uc-ui-lists_item_wrap:nth-child(2)'); // 登录密码验证
