@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 import browse from './browser.js';
 browse('https://creator.xiaohongshu.com/publish/publish?target=image', 18, async (page, media) => { // Max 18 pictures.
-	await page.waitForSelector('input.upload-input');
 	const [fileChooser] = await Promise.all([
 		page.waitForFileChooser(),
-		page.click('input.upload-input'),
+		page.click('div.drag-over'),
 	]);
 	console.assert(fileChooser.isMultiple());
 	await Promise.all([
@@ -13,27 +12,27 @@ browse('https://creator.xiaohongshu.com/publish/publish?target=image', 18, async
 	]);
 	await page.type('input.d-text', media.title); // Max 20 characters
 	await page.type('div.tiptap', media.description); // Max 1000 characters.
-	await page.type('div.address-box div.d-select-input-filter>input', media.address); // 添加地点
-	const addressAttr = await page.$eval('div.media-extension>div.formbox>div.plugin:nth-child(2)>div>form', el => el.attributes[0].name); // e.g. data-v-1452d0b4
-	await page.waitForSelector(`div[${addressAttr}].item`);
+	await page.type('div.address-card-wrapper div.d-select-input-filter>input', media.address); // 添加地点
+	const addressAttr = await page.$eval('div.address-card-wrapper', el => el.attributes[0].name); // e.g. data-v-1452d0b4
+	await page.waitForSelector(`div[${addressAttr}].option-item`);
 	await new Promise(resolve => setTimeout(resolve, 100));
-	await page.click(`div[${addressAttr}].item`); // 选择第一个地点
-	await page.click('span.btn-text.red::-p-text(去声明)'); // 去声明
-	await page.click('div.d-checkbox.bg-red'); // 我已阅读并同意 《原创声明须知》 ，如滥用声明，平台将驳回并予以相关处置
-	await page.click('button::-p-text(声明原创)'); // 声明原创
-	await page.click('div.d-select-wrapper::-p-text(添加内容类型声明)'); // 添加内容类型声明
+	await page.click(`div[${addressAttr}].option-item`); // 选择第一个地点
+	await page.click('div.original-wrapper span.d-switch-simulator'); // 原创声明
+	await page.click('div.originalContainer span.d-checkbox-simulator'); // 我已阅读并同意 《原创声明须知》 ，如滥用声明，平台将驳回并予以相关处置
+	await page.click('div.originalContainer button'); // 声明原创
 	await new Promise(resolve => setTimeout(resolve, 1000));
+	await page.click('div.d-select-wrapper::-p-text(添加内容类型声明)'); // 添加内容类型声明
 	await page.click('div.d-grid-item::-p-text(内容来源声明)');
 	await new Promise(resolve => setTimeout(resolve, 1500));
 	await page.click('div.d-grid-item::-p-text(自主拍摄)');
 	await new Promise(resolve => setTimeout(resolve, 2000));
 	await page.type('input[placeholder="下拉选择地点"]', media.address); // 拍摄地点
 	try {
-		await page.waitForSelector('div[id^="el-popper-container-"] ul>li', { timeout: 6000 }); // 等待加载地点
-		await new Promise(resolve => setTimeout(resolve, 500));
+		await page.waitForSelector('div[id^="el-popper-container-"] ul>li', { timeout: 9000 }); // 等待加载地点
+		await new Promise(resolve => setTimeout(resolve, 1500));
 		await page.click('div[id^="el-popper-container-"] ul>li'); // 选择第一个地点
-		await new Promise(resolve => setTimeout(resolve, 500));
-	} catch {}
+		await new Promise(resolve => setTimeout(resolve, 1500));
+	} catch (error) { console.error(error);	}
 	await page.type('input[placeholder="下拉选择日期"]', `${media.date.substring(0, 4)}-${media.date.substring(4, 6)}-${media.date.substring(6, 8)}`); // 拍摄日期
 	await new Promise(resolve => setTimeout(resolve, 1000));
 	await page.click('button::-p-text(确认)'); // 确认
@@ -48,6 +47,6 @@ browse('https://creator.xiaohongshu.com/publish/publish?target=image', 18, async
 	});
 	await Promise.all([
 		page.waitForNavigation({ waitUntil: 'networkidle2' }),
-		page.click('div.submit>button'),
+		page.click('div.publish-page-publish-btn > button.bg-red'),
 	]);
 });
