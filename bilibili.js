@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import browse from './browser.js';
-browse('https://member.bilibili.com/platform/upload/text/edit', 20, async (page, media) => { // Max 20 pictures. Bilibili supports uploading images multiple times, each time 20 images.
+browse('https://member.bilibili.com/platform/upload/text/new-edit', 20, async (page, media) => { // Max 20 pictures. Bilibili supports uploading images multiple times, each time 20 images.
 	const frameHandle = await page.waitForSelector('iframe[src="/article-text/home?"]');
 	await new Promise(resolve => setTimeout(resolve, 500));
 	const frame = await frameHandle.contentFrame();

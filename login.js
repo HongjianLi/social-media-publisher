@@ -31,7 +31,7 @@ const siteArr = [{
 	url: 'https://baijiahao.baidu.com/builder/rc/edit?type=news',
 	domain: '.baidu.com',
 }, {
-	url: 'https://member.bilibili.com/platform/upload/text/edit',
+	url: 'https://member.bilibili.com/platform/upload/text/new-edit',
 	domain: '.bilibili.com',
 }, {
 	url: 'https://user.qzone.qq.com/439629497/311',
