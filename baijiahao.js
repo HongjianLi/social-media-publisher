@@ -6,6 +6,7 @@ browse('https://baijiahao.baidu.com/builder/rc/edit?type=news', 60, async (page,
 		await page.click('button.cheetah-tour-close');
 	} catch {}
 	await page.type('div._9ddb7e475b559749-editor', media.title); // Max 64 characters.
+	await page.click('span.aigc_bjh_status'); // AI创作声明
 	const frameHandle = await page.waitForSelector('iframe#ueditor_0');
 	await new Promise(resolve => setTimeout(resolve, 500));
 	const frame = await frameHandle.contentFrame();
