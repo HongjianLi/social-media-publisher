@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import browse from './browser.js';
 browse('https://baijiahao.baidu.com/builder/rc/edit?type=news', 60, async (page, media) => { // Max 60 pictures
-	await page.waitForSelector('button.cheetah-tour-close');
-	await page.click('button.cheetah-tour-close');
+	try {
+		await page.waitForSelector('button.cheetah-tour-close', { timeout: 3000 }); // Sometimes this tour button does not appear.
+		await page.click('button.cheetah-tour-close');
+	} catch {}
 	await page.type('div._9ddb7e475b559749-editor', media.title); // Max 64 characters.
 	const frameHandle = await page.waitForSelector('iframe#ueditor_0');
 	await new Promise(resolve => setTimeout(resolve, 500));
