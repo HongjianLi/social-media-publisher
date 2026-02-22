@@ -26,7 +26,7 @@ export default async (url, numFiles = 9, pageHandler) => {
 		await page.setGeolocation({ latitude: media.latitude, longitude: media.longitude }); // https://pptr.dev/api/puppeteer.page.setgeolocation
 		const response = await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
 //		console.assert(response.ok()); // kuaishou would fail this assertion.
-		console.assert(page.url() === url);
+		console.assert(page.url() === url, `page ${url} redirected to ${page.url()}`); // This assertion would fail if the login credentials expire and the page gets redirected.
 		media.fileArr = media.fileArr.map(file => `${media.dir}/${file}`);
 		media.address = `${media.country === '中国' ? media.province : media.country}${media.city}${media.district.length ? media.district : media.town}`; // The granularity of address is at the district level, not the town level, because toutiao and weibo often lack selectable addresses for a specific town.
 		media.title = `${media.date}${media.weekday}${media.address}`;
