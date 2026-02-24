@@ -23,8 +23,9 @@ browse('https://baijiahao.baidu.com/builder/rc/edit?type=news', 60, async (page,
 		fileChooser.accept(media.fileArr),
 	]);
 	await page.click('button.css-1ho6t72:not([disabled])');
-	await new Promise(resolve => setTimeout(resolve, 2000));
+	await new Promise(resolve => setTimeout(resolve, 3000));
 	await page.click('div.cheetah-spin-container'); // 选择封面
+	await new Promise(resolve => setTimeout(resolve, 500));
 	await page.waitForSelector('div.e8c90bfac9d4eab4-list>div');
 	await new Promise(resolve => setTimeout(resolve, 500));
 	const nth = Math.ceil(media.fileArr.length / 2);
