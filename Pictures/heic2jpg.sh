@@ -4,7 +4,7 @@ for dir in *; do
 		echo "$dir"
 		cd "$dir"
 		magick mogrify -format jpg *.HEIC
-		rm *.HEIC
+		rm *.HEIC *.mp4
 		cd ..
 	fi
 done
