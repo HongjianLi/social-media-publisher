@@ -1,0 +1,1 @@
+30 7 * * * cd ~/web/apps/publisher; ./start.sh > start.log 2>&1
