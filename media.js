@@ -117,7 +117,7 @@ for (const media of mediaArr) { // Use sequential loop instead of promise.all, b
 		return response.json();
 	});
 	if (revGeo.status !== 0) {
-		console.error(`revGeo.status`, revGeo.status); // 1: 服务器内部错误; 302: 天配额超限，限制访问; 401: 当前并发量已经超过约定并发配额，限制访问;
+		console.error(`revGeo.status`, revGeo.status); // 1: 服务器内部错误; 240: APP 服务被禁用; 302: 天配额超限，限制访问; 401: 当前并发量已经超过约定并发配额，限制访问;
 		break;
 	}
 	let { country, province, city, district, town } = revGeo.result.addressComponent;
