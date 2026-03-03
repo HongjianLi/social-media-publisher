@@ -10,7 +10,7 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"exifreader": "^4.35.0"
+		"exifreader": "^4.36.2"
 	},
 	"scripts": {
 		"start": "node media.js; node login.js; node douyin.js; node toutiao.js; node kuaishou.js; node xiaohongshu.js; node weibo.js; node baijiahao.js; node bilibili.js; node qzone.js;"
